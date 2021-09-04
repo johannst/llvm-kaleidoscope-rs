@@ -12,7 +12,7 @@ pub enum ExprAST {
     Binary(char, Box<ExprAST>, Box<ExprAST>),
 
     /// Call - Expression class for function calls.
-    Call(String, Vec<Box<ExprAST>>),
+    Call(String, Vec<ExprAST>),
 }
 
 /// PrototypeAST - This class represents the "prototype" for a function,
@@ -23,7 +23,7 @@ pub struct PrototypeAST(String, Vec<String>);
 
 /// FunctionAST - This class represents a function definition itself.
 #[derive(Debug)]
-pub struct FunctionAST(Box<PrototypeAST>, Box<ExprAST>);
+pub struct FunctionAST(PrototypeAST, ExprAST);
 
 /// Parse result with String as Error type (to be compliant with tutorial).
 type ParseResult<T> = Result<T, String>;
@@ -73,12 +73,12 @@ where
     /// numberexpr ::= number
     ///
     /// Implement `std::unique_ptr<ExprAST> ParseNumberExpr();` from the tutorial.
-    fn parse_num_expr(&mut self) -> ParseResult<Box<ExprAST>> {
+    fn parse_num_expr(&mut self) -> ParseResult<ExprAST> {
         match *self.cur_tok() {
             Token::Number(num) => {
                 // Consume the number token.
                 self.get_next_token();
-                Ok(Box::new(ExprAST::Number(num)))
+                Ok(ExprAST::Number(num))
             }
             _ => unreachable!(),
         }
@@ -87,7 +87,7 @@ where
     /// parenexpr ::= '(' expression ')'
     ///
     /// Implement `std::unique_ptr<ExprAST> ParseParenExpr();` from the tutorial.
-    fn parse_paren_expr(&mut self) -> ParseResult<Box<ExprAST>> {
+    fn parse_paren_expr(&mut self) -> ParseResult<ExprAST> {
         // Eat '(' token.
         assert_eq!(*self.cur_tok(), Token::Char('('));
         self.get_next_token();
@@ -108,7 +108,7 @@ where
     ///   ::= identifier '(' expression* ')'
     ///
     /// Implement `std::unique_ptr<ExprAST> ParseIdentifierExpr();` from the tutorial.
-    fn parse_identifier_expr(&mut self) -> ParseResult<Box<ExprAST>> {
+    fn parse_identifier_expr(&mut self) -> ParseResult<ExprAST> {
         let id_name = match self.cur_tok.take() {
             Some(Token::Identifier(id)) => {
                 // Consume identifier.
@@ -120,14 +120,14 @@ where
 
         if *self.cur_tok() != Token::Char('(') {
             // Simple variable reference.
-            Ok(Box::new(ExprAST::Variable(id_name)))
+            Ok(ExprAST::Variable(id_name))
         } else {
             // Call.
 
             // Eat '(' token.
             self.get_next_token();
 
-            let mut args: Vec<Box<ExprAST>> = Vec::new();
+            let mut args: Vec<ExprAST> = Vec::new();
 
             // If there are arguments collect them.
             if *self.cur_tok() != Token::Char(')') {
@@ -149,7 +149,7 @@ where
                 }
             }
 
-            Ok(Box::new(ExprAST::Call(id_name, args)))
+            Ok(ExprAST::Call(id_name, args))
         }
     }
 
@@ -159,7 +159,7 @@ where
     ///   ::= parenexpr
     ///
     /// Implement `std::unique_ptr<ExprAST> ParsePrimary();` from the tutorial.
-    fn parse_primary(&mut self) -> ParseResult<Box<ExprAST>> {
+    fn parse_primary(&mut self) -> ParseResult<ExprAST> {
         match *self.cur_tok() {
             Token::Identifier(_) => self.parse_identifier_expr(),
             Token::Number(_) => self.parse_num_expr(),
@@ -176,7 +176,7 @@ where
     ///   ::= primary binoprhs
     ///
     /// Implement `std::unique_ptr<ExprAST> ParseExpression();` from the tutorial.
-    fn parse_expression(&mut self) -> ParseResult<Box<ExprAST>> {
+    fn parse_expression(&mut self) -> ParseResult<ExprAST> {
         let lhs = self.parse_primary()?;
         self.parse_bin_op_rhs(0, lhs)
     }
@@ -185,11 +185,7 @@ where
     ///   ::= ('+' primary)*
     ///
     /// Implement `std::unique_ptr<ExprAST> ParseBinOpRHS(int ExprPrec, std::unique_ptr<ExprAST> LHS);` from the tutorial.
-    fn parse_bin_op_rhs(
-        &mut self,
-        expr_prec: isize,
-        mut lhs: Box<ExprAST>,
-    ) -> ParseResult<Box<ExprAST>> {
+    fn parse_bin_op_rhs(&mut self, expr_prec: isize, mut lhs: ExprAST) -> ParseResult<ExprAST> {
         loop {
             let tok_prec = get_tok_precedence(self.cur_tok());
 
@@ -226,7 +222,7 @@ where
                 rhs = self.parse_bin_op_rhs(tok_prec + 1, rhs)?
             }
 
-            lhs = Box::new(ExprAST::Binary(binop, lhs, rhs));
+            lhs = ExprAST::Binary(binop, Box::new(lhs), Box::new(rhs));
         }
     }
 
@@ -238,7 +234,7 @@ where
     ///   ::= id '(' id* ')'
     ///
     /// Implement `std::unique_ptr<PrototypeAST> ParsePrototype();` from the tutorial.
-    fn parse_prototype(&mut self) -> ParseResult<Box<PrototypeAST>> {
+    fn parse_prototype(&mut self) -> ParseResult<PrototypeAST> {
         let id_name = match self.cur_tok.take() {
             Some(Token::Identifier(id)) => {
                 // Consume the identifier.
@@ -276,13 +272,13 @@ where
         // Consume ')'.
         self.get_next_token();
 
-        Ok(Box::new(PrototypeAST(id_name, args)))
+        Ok(PrototypeAST(id_name, args))
     }
 
     /// definition ::= 'def' prototype expression
     ///
     /// Implement `std::unique_ptr<FunctionAST> ParseDefinition();` from the tutorial.
-    pub fn parse_definition(&mut self) -> ParseResult<Box<FunctionAST>> {
+    pub fn parse_definition(&mut self) -> ParseResult<FunctionAST> {
         // Consume 'def' token.
         assert_eq!(*self.cur_tok(), Token::Def);
         self.get_next_token();
@@ -290,13 +286,13 @@ where
         let proto = self.parse_prototype()?;
         let expr = self.parse_expression()?;
 
-        Ok(Box::new(FunctionAST(proto, expr)))
+        Ok(FunctionAST(proto, expr))
     }
 
     /// external ::= 'extern' prototype
     ///
     /// Implement `std::unique_ptr<PrototypeAST> ParseExtern();` from the tutorial.
-    pub fn parse_extern(&mut self) -> ParseResult<Box<PrototypeAST>> {
+    pub fn parse_extern(&mut self) -> ParseResult<PrototypeAST> {
         // Consume 'extern' token.
         assert_eq!(*self.cur_tok(), Token::Extern);
         self.get_next_token();
@@ -307,10 +303,10 @@ where
     /// toplevelexpr ::= expression
     ///
     /// Implement `std::unique_ptr<FunctionAST> ParseTopLevelExpr();` from the tutorial.
-    pub fn parse_top_level_expr(&mut self) -> ParseResult<Box<FunctionAST>> {
+    pub fn parse_top_level_expr(&mut self) -> ParseResult<FunctionAST> {
         let e = self.parse_expression()?;
-        let proto = Box::new(PrototypeAST("".into(), Vec::new()));
-        Ok(Box::new(FunctionAST(proto, e)))
+        let proto = PrototypeAST("".into(), Vec::new());
+        Ok(FunctionAST(proto, e))
     }
 }
 
@@ -346,7 +342,7 @@ mod test {
     fn parse_number() {
         let mut p = parser("13.37");
 
-        assert_eq!(p.parse_num_expr(), Ok(Box::new(ExprAST::Number(13.37f64))));
+        assert_eq!(p.parse_num_expr(), Ok(ExprAST::Number(13.37f64)));
     }
 
     #[test]
@@ -355,7 +351,7 @@ mod test {
 
         assert_eq!(
             p.parse_identifier_expr(),
-            Ok(Box::new(ExprAST::Variable("foop".into())))
+            Ok(ExprAST::Variable("foop".into()))
         );
     }
 
@@ -363,19 +359,13 @@ mod test {
     fn parse_primary() {
         let mut p = parser("1337 foop \n bla(123)");
 
-        assert_eq!(p.parse_primary(), Ok(Box::new(ExprAST::Number(1337f64))));
+        assert_eq!(p.parse_primary(), Ok(ExprAST::Number(1337f64)));
+
+        assert_eq!(p.parse_primary(), Ok(ExprAST::Variable("foop".into())));
 
         assert_eq!(
             p.parse_primary(),
-            Ok(Box::new(ExprAST::Variable("foop".into())))
-        );
-
-        assert_eq!(
-            p.parse_primary(),
-            Ok(Box::new(ExprAST::Call(
-                "bla".into(),
-                vec![Box::new(ExprAST::Number(123f64))]
-            )))
+            Ok(ExprAST::Call("bla".into(), vec![ExprAST::Number(123f64)]))
         );
     }
 
@@ -390,17 +380,17 @@ mod test {
         //   a   b
         let mut p = parser("a + b - c");
 
-        let binexpr_ab = Box::new(ExprAST::Binary(
+        let binexpr_ab = ExprAST::Binary(
             '+',
             Box::new(ExprAST::Variable("a".into())),
             Box::new(ExprAST::Variable("b".into())),
-        ));
+        );
 
-        let binexpr_abc = Box::new(ExprAST::Binary(
+        let binexpr_abc = ExprAST::Binary(
             '-',
-            binexpr_ab,
+            Box::new(binexpr_ab),
             Box::new(ExprAST::Variable("c".into())),
-        ));
+        );
 
         assert_eq!(p.parse_expression(), Ok(binexpr_abc));
     }
@@ -416,17 +406,17 @@ mod test {
         //       b   c
         let mut p = parser("a + b * c");
 
-        let binexpr_bc = Box::new(ExprAST::Binary(
+        let binexpr_bc = ExprAST::Binary(
             '*',
             Box::new(ExprAST::Variable("b".into())),
             Box::new(ExprAST::Variable("c".into())),
-        ));
+        );
 
-        let binexpr_abc = Box::new(ExprAST::Binary(
+        let binexpr_abc = ExprAST::Binary(
             '+',
             Box::new(ExprAST::Variable("a".into())),
-            binexpr_bc,
-        ));
+            Box::new(binexpr_bc),
+        );
 
         assert_eq!(p.parse_expression(), Ok(binexpr_abc));
     }
