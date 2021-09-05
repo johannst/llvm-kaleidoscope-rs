@@ -47,7 +47,7 @@ where
 fn main() {
     println!("Parse stdin.");
     println!("ENTER to parse current input.");
-    println!("C-c   to exit.");
+    println!("C-d   to exit.");
 
     let lexer = Lexer::new(std::io::stdin().bytes().filter_map(|v| {
         let v = v.ok()?;
