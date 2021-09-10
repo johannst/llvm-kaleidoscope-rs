@@ -18,11 +18,11 @@ pub enum ExprAST {
 /// PrototypeAST - This class represents the "prototype" for a function,
 /// which captures its name, and its argument names (thus implicitly the number
 /// of arguments the function takes).
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct PrototypeAST(String, Vec<String>);
 
 /// FunctionAST - This class represents a function definition itself.
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct FunctionAST(PrototypeAST, ExprAST);
 
 /// Parse result with String as Error type (to be compliant with tutorial).
@@ -258,6 +258,7 @@ where
 
             match self.cur_tok.take() {
                 Some(Token::Identifier(arg)) => args.push(arg),
+                Some(Token::Char(',')) => {}
                 other => {
                     self.cur_tok = other;
                     break;
@@ -325,7 +326,7 @@ fn get_tok_precedence(tok: &Token) -> isize {
 
 #[cfg(test)]
 mod test {
-    use super::{ExprAST, Parser};
+    use super::{ExprAST, FunctionAST, Parser, PrototypeAST};
     use crate::lexer::Lexer;
 
     fn parser(input: &str) -> Parser<std::str::Chars> {
@@ -419,5 +420,40 @@ mod test {
         );
 
         assert_eq!(p.parse_expression(), Ok(binexpr_abc));
+    }
+
+    #[test]
+    fn parse_prototype() {
+        let mut p = parser("foo(a,b)");
+
+        let proto = PrototypeAST("foo".into(), vec!["a".into(), "b".into()]);
+
+        assert_eq!(p.parse_prototype(), Ok(proto));
+    }
+
+    #[test]
+    fn parse_definition() {
+        let mut p = parser("def bar( arg0 , arg1 ) arg0 + arg1");
+
+        let proto = PrototypeAST("bar".into(), vec!["arg0".into(), "arg1".into()]);
+
+        let body = ExprAST::Binary(
+            '+',
+            Box::new(ExprAST::Variable("arg0".into())),
+            Box::new(ExprAST::Variable("arg1".into())),
+        );
+
+        let func = FunctionAST(proto, body);
+
+        assert_eq!(p.parse_definition(), Ok(func));
+    }
+
+    #[test]
+    fn parse_extern() {
+        let mut p = parser("extern baz()");
+
+        let proto = PrototypeAST("baz".into(), vec![]);
+
+        assert_eq!(p.parse_extern(), Ok(proto));
     }
 }
