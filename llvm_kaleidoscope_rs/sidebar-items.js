@@ -1,0 +1,1 @@
+initSidebarItems({"constant":[["SMALL_STR_SIZE","Fixed size of [`SmallCStr`] including the trailing `\\0` byte."]],"enum":[["Either","Either type, for APIs accepting two types."]],"mod":[["codegen",""],["lexer",""],["llvm","Safe wrapper around the LLVM C API."],["parser",""]],"struct":[["SmallCStr","Small C string on the stack with fixed size [`SMALL_STR_SIZE`]."]]});
