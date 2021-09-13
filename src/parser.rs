@@ -19,15 +19,16 @@ pub enum ExprAST {
 /// which captures its name, and its argument names (thus implicitly the number
 /// of arguments the function takes).
 #[derive(Debug, PartialEq)]
-pub struct PrototypeAST(String, Vec<String>);
+pub struct PrototypeAST(pub String, pub Vec<String>);
 
 /// FunctionAST - This class represents a function definition itself.
 #[derive(Debug, PartialEq)]
-pub struct FunctionAST(PrototypeAST, ExprAST);
+pub struct FunctionAST(pub PrototypeAST, pub ExprAST);
 
 /// Parse result with String as Error type (to be compliant with tutorial).
 type ParseResult<T> = Result<T, String>;
 
+/// Parser for the `kaleidoscope` language.
 pub struct Parser<I>
 where
     I: Iterator<Item = char>,
