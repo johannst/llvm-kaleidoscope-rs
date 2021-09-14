@@ -30,7 +30,7 @@ implemented in [`src/llvm.rs`](src/llvm.rs)
 ## Documentation
 
 Rustdoc for this crate is available at
-[johannst.github.io/llvm-kaleidoscope-rs](gh-pages).
+[johannst.github.io/llvm-kaleidoscope-rs][gh-pages].
 
 ## License
 
