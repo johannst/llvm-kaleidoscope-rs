@@ -9,6 +9,8 @@ pub mod parser;
 pub const SMALL_STR_SIZE: usize = 16;
 
 /// Small C string on the stack with fixed size [`SMALL_STR_SIZE`].
+///
+/// This is specially crafted to interact with the LLVM C API and get rid of some heap allocations.
 #[derive(Debug, PartialEq)]
 pub struct SmallCStr([u8; SMALL_STR_SIZE]);
 
