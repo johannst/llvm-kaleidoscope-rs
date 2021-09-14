@@ -109,6 +109,8 @@
 <span id="107">107</span>
 <span id="108">108</span>
 <span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
 
@@ -121,6 +123,8 @@
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">SMALL_STR_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">16</span>;
 
 <span class="doccomment">/// Small C string on the stack with fixed size [`SMALL_STR_SIZE`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// This is specially crafted to interact with the LLVM C API and get rid of some heap allocations.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SmallCStr</span>([<span class="ident">u8</span>; <span class="ident">SMALL_STR_SIZE</span>]);
 
