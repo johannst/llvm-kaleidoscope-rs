@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::llvm::{Builder, FnValue, FunctionPassManager, Module, Value};
+use crate::llvm::{FnValue, FunctionPassManager, IRBuilder, Module, Value};
 use crate::parser::{ExprAST, FunctionAST, PrototypeAST};
 use crate::Either;
 
@@ -9,7 +9,7 @@ type CodegenResult<T> = Result<T, String>;
 /// Code generator from kaleidoscope AST to LLVM IR.
 pub struct Codegen<'llvm, 'a> {
     module: &'llvm Module,
-    builder: &'a Builder<'llvm>,
+    builder: &'a IRBuilder<'llvm>,
     fpm: &'a FunctionPassManager<'llvm>,
 }
 
@@ -21,7 +21,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
     ) -> CodegenResult<FnValue<'llvm>> {
         let cg = Codegen {
             module,
-            builder: &Builder::with_ctx(module),
+            builder: &IRBuilder::with_ctx(module),
             fpm: &FunctionPassManager::with_ctx(module),
         };
         let mut variables = HashMap::new();
@@ -129,7 +129,10 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
         if let Ok(ret) = self.codegen_expr(body, named_values) {
             self.builder.ret(ret);
             assert!(the_function.verify());
+
+            // Run the optimization passes on the function.
             self.fpm.run(the_function);
+
             Ok(the_function)
         } else {
             todo!("Failed to codegen function body, erase from module!");
