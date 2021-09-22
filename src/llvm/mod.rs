@@ -8,7 +8,7 @@
 //! For the scope of this tutorial we mainly use assertions to validate the results from the LLVM
 //! API calls.
 
-use llvm_sys::prelude::LLVMBasicBlockRef;
+use llvm_sys::{core::LLVMShutdown, prelude::LLVMBasicBlockRef};
 
 use std::marker::PhantomData;
 
@@ -27,3 +27,10 @@ pub use value::{FnValue, Value};
 /// Wrapper for a LLVM Basic Block.
 #[derive(Copy, Clone)]
 pub struct BasicBlock<'llvm>(LLVMBasicBlockRef, PhantomData<&'llvm ()>);
+
+/// Deallocate and destroy all "ManagedStatic" variables.
+pub fn shutdown() {
+    unsafe {
+        LLVMShutdown();
+    };
+}

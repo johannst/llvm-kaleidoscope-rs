@@ -98,4 +98,6 @@ fn main() {
 
     // Dump all the emitted LLVM IR to stdout.
     module.dump();
+
+    llvm::shutdown();
 }
