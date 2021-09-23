@@ -1,8 +1,12 @@
 use llvm_sys::{
     core::{
-        LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMContextCreate, LLVMContextDispose,
-        LLVMDisposeModule, LLVMDoubleTypeInContext, LLVMDumpModule, LLVMGetNamedFunction,
-        LLVMModuleCreateWithNameInContext,
+        LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMDisposeModule, LLVMDoubleTypeInContext,
+        LLVMDumpModule, LLVMGetNamedFunction, LLVMModuleCreateWithNameInContext,
+    },
+    orc2::{
+        LLVMOrcCreateNewThreadSafeContext, LLVMOrcCreateNewThreadSafeModule,
+        LLVMOrcDisposeThreadSafeContext, LLVMOrcThreadSafeContextGetContext,
+        LLVMOrcThreadSafeContextRef, LLVMOrcThreadSafeModuleRef,
     },
     prelude::{LLVMBool, LLVMContextRef, LLVMModuleRef, LLVMTypeRef},
     LLVMTypeKind,
@@ -26,6 +30,7 @@ extern "C" {
 
 /// Wrapper for a LLVM Module with its own LLVM Context.
 pub struct Module {
+    tsctx: LLVMOrcThreadSafeContextRef,
     ctx: LLVMContextRef,
     module: LLVMModuleRef,
 }
@@ -37,14 +42,23 @@ impl<'llvm> Module {
     ///
     /// Panics if creating the context or the module fails.
     pub fn new() -> Self {
-        let (ctx, module) = unsafe {
-            let c = LLVMContextCreate();
+        let (tsctx, ctx, module) = unsafe {
+            // We generate a thread safe context because we are going to jit this IR module and
+            // there is no method to create a thread safe context wrapper from an existing context
+            // reference (at the time of writing this).
+            //
+            // ThreadSafeContext has shared ownership (start with ref count 1).
+            // We must explicitly dispose our reference (dec ref count).
+            let tc = LLVMOrcCreateNewThreadSafeContext();
+            assert!(!tc.is_null());
+
+            let c = LLVMOrcThreadSafeContextGetContext(tc);
             let m = LLVMModuleCreateWithNameInContext(b"module\0".as_ptr().cast(), c);
             assert!(!c.is_null() && !m.is_null());
-            (c, m)
+            (tc, c, m)
         };
 
-        Module { ctx, module }
+        Module { tsctx, ctx, module }
     }
 
     /// Get the raw LLVM context reference.
@@ -57,6 +71,25 @@ impl<'llvm> Module {
     #[inline]
     pub(super) fn module(&self) -> LLVMModuleRef {
         self.module
+    }
+
+    /// Consume the module and turn in into a raw LLVM ThreadSafeModule reference.
+    ///
+    /// If ownership of the raw reference is not transferred (eg to the JIT), memory will be leaked
+    /// in case the reference is disposed explicitly with LLVMOrcDisposeThreadSafeModule.
+    #[inline]
+    pub(super) fn into_raw_thread_safe_module(mut self) -> LLVMOrcThreadSafeModuleRef {
+        let m = std::mem::replace(&mut self.module, std::ptr::null_mut());
+
+        // ThreadSafeModule has unique ownership.
+        // Takes ownership of module and increments ThreadSafeContext ref count.
+        //
+        // We must not reference/dispose `m` after this call, but we need to dispose our `tsctx`
+        // reference.
+        let tm = unsafe { LLVMOrcCreateNewThreadSafeModule(m, self.tsctx) };
+        assert!(!tm.is_null());
+
+        tm
     }
 
     /// Dump LLVM IR emitted into the Module to stdout.
@@ -150,8 +183,14 @@ impl<'llvm> Module {
 impl Drop for Module {
     fn drop(&mut self) {
         unsafe {
-            LLVMDisposeModule(self.module);
-            LLVMContextDispose(self.ctx);
+            // In case we turned the module into a ThreadSafeModule, we must not dispose the module
+            // reference because ThreadSafeModule took ownership!
+            if !self.module.is_null() {
+                LLVMDisposeModule(self.module);
+            }
+
+            // Dispose ThreadSafeContext reference (dec ref count) in any case.
+            LLVMOrcDisposeThreadSafeContext(self.tsctx);
         }
     }
 }
