@@ -18,7 +18,7 @@ pub enum ExprAST {
 /// PrototypeAST - This class represents the "prototype" for a function,
 /// which captures its name, and its argument names (thus implicitly the number
 /// of arguments the function takes).
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct PrototypeAST(pub String, pub Vec<String>);
 
 /// FunctionAST - This class represents a function definition itself.
@@ -307,7 +307,7 @@ where
     /// Implement `std::unique_ptr<FunctionAST> ParseTopLevelExpr();` from the tutorial.
     pub fn parse_top_level_expr(&mut self) -> ParseResult<FunctionAST> {
         let e = self.parse_expression()?;
-        let proto = PrototypeAST("".into(), Vec::new());
+        let proto = PrototypeAST("__anon_expr".into(), Vec::new());
         Ok(FunctionAST(proto, e))
     }
 }

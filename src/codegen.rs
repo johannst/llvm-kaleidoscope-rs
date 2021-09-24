@@ -11,18 +11,21 @@ pub struct Codegen<'llvm, 'a> {
     module: &'llvm Module,
     builder: &'a IRBuilder<'llvm>,
     fpm: &'a FunctionPassManager<'llvm>,
+    fn_protos: &'a mut HashMap<String, PrototypeAST>,
 }
 
 impl<'llvm, 'a> Codegen<'llvm, 'a> {
     /// Compile either a [`PrototypeAST`] or a [`FunctionAST`] into the LLVM `module`.
     pub fn compile(
         module: &'llvm Module,
+        fn_protos: &mut HashMap<String, PrototypeAST>,
         compilee: Either<&PrototypeAST, &FunctionAST>,
     ) -> CodegenResult<FnValue<'llvm>> {
-        let cg = Codegen {
+        let mut cg = Codegen {
             module,
             builder: &IRBuilder::with_ctx(module),
             fpm: &FunctionPassManager::with_ctx(module),
+            fn_protos,
         };
         let mut variables = HashMap::new();
 
@@ -59,7 +62,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
                     _ => Err("invalid binary operator".into()),
                 }
             }
-            ExprAST::Call(callee, args) => match self.module.get_fn(callee) {
+            ExprAST::Call(callee, args) => match self.get_function(callee) {
                 Some(callee) => {
                     if callee.args() != args.len() {
                         return Err("Incorrect # arguments passed".into());
@@ -99,14 +102,16 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
     }
 
     fn codegen_function(
-        &self,
+        &mut self,
         FunctionAST(proto, body): &FunctionAST,
         named_values: &mut HashMap<&'llvm str, Value<'llvm>>,
     ) -> CodegenResult<FnValue<'llvm>> {
-        let the_function = match self.module.get_fn(&proto.0) {
-            Some(f) => f,
-            None => self.codegen_prototype(proto),
-        };
+        // Insert the function prototype into the `fn_protos` map to keep track for re-generating
+        // declarations in other modules.
+        self.fn_protos.insert(proto.0.clone(), proto.clone());
+
+        let the_function = self.get_function(&proto.0)
+            .expect("If proto not already generated, get_function will do for us since we updated fn_protos before-hand!");
 
         if the_function.basic_blocks() > 0 {
             return Err("Function cannot be redefined.".into());
@@ -137,5 +142,21 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
         } else {
             todo!("Failed to codegen function body, erase from module!");
         }
+    }
+
+    /// Lookup function with `name` in the LLVM module and return the corresponding value reference.
+    /// If the function is not available in the module, check if the prototype is known and codegen
+    /// it.
+    /// Return [`None`] if the prototype is not known.
+    fn get_function(&self, name: &str) -> Option<FnValue<'llvm>> {
+        let callee = match self.module.get_fn(name) {
+            Some(callee) => callee,
+            None => {
+                let proto = self.fn_protos.get(name)?;
+                self.codegen_prototype(proto)
+            }
+        };
+
+        Some(callee)
     }
 }
