@@ -149,6 +149,9 @@
 <span id="149">149</span>
 <span id="150">150</span>
 <span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
 </pre><pre class="rust">
 <span class="kw">use</span> <span class="ident">llvm_sys::orc2</span>::{
     <span class="ident">lljit</span>::{
@@ -171,6 +174,7 @@
 
 <span class="kw">impl</span> <span class="ident">JitFn</span> <span class="kw">for</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {}
 
+<span class="doccomment">/// Wrapper for a LLVM [LLJIT](https://www.llvm.org/docs/ORCv2.html#lljit-and-lllazyjit).</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LLJit</span> {
     <span class="ident">jit</span>: <span class="ident">LLVMOrcLLJITRef</span>,
     <span class="ident">dylib</span>: <span class="ident">LLVMOrcJITDylibRef</span>,
@@ -277,8 +281,10 @@
     }
 }
 
-<span class="doccomment">/// A resource handle to code added to an [`LLJit`] instance. When a `ResourceTracker` handle is</span>
-<span class="doccomment">/// dropped, the code corresponding to the handle will be removed from the JIT.</span>
+<span class="doccomment">/// A resource handle for code added to an [`LLJit`] instance.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// When a `ResourceTracker` handle is dropped, the code corresponding to the handle will be</span>
+<span class="doccomment">/// removed from the JIT.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span>(<span class="ident">LLVMOrcResourceTrackerRef</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;jit</span> ()<span class="op">&gt;</span>);
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span> <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span> {
