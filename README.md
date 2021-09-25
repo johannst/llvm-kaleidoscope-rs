@@ -15,6 +15,7 @@ out the corresponding tag for the chapter.
 chapter1
 chapter2
 chapter3
+chapter4
 ```
 
 Names of variables and functions as well as the structure of the functions are
@@ -25,7 +26,7 @@ tutorial.
 One further note on the llvm API, instead of using the llvm `C++` API we are
 going to use the llvm `C` API and build our own safe wrapper specialized for
 this tutorial. The wrapper offers a similar interface as the `C++` API and is
-implemented in [`src/llvm.rs`](src/llvm.rs)
+implemented in [`src/llvm/`](src/llvm/)
 
 ## Documentation
 

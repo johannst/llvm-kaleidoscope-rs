@@ -19,6 +19,7 @@ pub trait JitFn {}
 
 impl JitFn for unsafe extern "C" fn() -> f64 {}
 
+/// Wrapper for a LLVM [LLJIT](https://www.llvm.org/docs/ORCv2.html#lljit-and-lllazyjit).
 pub struct LLJit {
     jit: LLVMOrcLLJITRef,
     dylib: LLVMOrcJITDylibRef,
@@ -125,8 +126,10 @@ impl LLJit {
     }
 }
 
-/// A resource handle to code added to an [`LLJit`] instance. When a `ResourceTracker` handle is
-/// dropped, the code corresponding to the handle will be removed from the JIT.
+/// A resource handle for code added to an [`LLJit`] instance.
+///
+/// When a `ResourceTracker` handle is dropped, the code corresponding to the handle will be
+/// removed from the JIT.
 pub struct ResourceTracker<'jit>(LLVMOrcResourceTrackerRef, PhantomData<&'jit ()>);
 
 impl<'jit> ResourceTracker<'jit> {
