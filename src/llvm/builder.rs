@@ -1,7 +1,8 @@
 use llvm_sys::{
     core::{
-        LLVMBuildFAdd, LLVMBuildFCmp, LLVMBuildFMul, LLVMBuildFSub, LLVMBuildRet, LLVMBuildUIToFP,
-        LLVMCreateBuilderInContext, LLVMDisposeBuilder, LLVMPositionBuilderAtEnd,
+        LLVMAddIncoming, LLVMBuildBr, LLVMBuildCondBr, LLVMBuildFAdd, LLVMBuildFCmp, LLVMBuildFMul,
+        LLVMBuildFSub, LLVMBuildPhi, LLVMBuildRet, LLVMBuildUIToFP, LLVMCreateBuilderInContext,
+        LLVMDisposeBuilder, LLVMGetInsertBlock, LLVMPositionBuilderAtEnd,
     },
     prelude::{LLVMBuilderRef, LLVMValueRef},
     LLVMRealPredicate,
@@ -48,8 +49,20 @@ impl<'llvm> IRBuilder<'llvm> {
     /// Position the IR Builder at the end of the given Basic Block.
     pub fn pos_at_end(&self, bb: BasicBlock<'llvm>) {
         unsafe {
-            LLVMPositionBuilderAtEnd(self.builder, bb.0);
+            LLVMPositionBuilderAtEnd(self.builder, bb.bb_ref());
         }
+    }
+
+    /// Get the BasicBlock the IRBuilder currently inputs into.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn get_insert_block(&self) -> BasicBlock<'llvm> {
+        let bb_ref = unsafe { LLVMGetInsertBlock(self.builder) };
+        assert!(!bb_ref.is_null());
+
+        BasicBlock::new(bb_ref)
     }
 
     /// Emit a [fadd](https://llvm.org/docs/LangRef.html#fadd-instruction) instruction.
@@ -112,7 +125,7 @@ impl<'llvm> IRBuilder<'llvm> {
         Value::new(value_ref)
     }
 
-    /// Emit a [fcmult](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.
+    /// Emit a [fcmpult](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.
     ///
     /// # Panics
     ///
@@ -128,6 +141,27 @@ impl<'llvm> IRBuilder<'llvm> {
                 lhs.value_ref(),
                 rhs.value_ref(),
                 b"fcmplt\0".as_ptr().cast(),
+            )
+        };
+        Value::new(value_ref)
+    }
+
+    /// Emit a [fcmpone](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn fcmpone(&self, lhs: Value<'llvm>, rhs: Value<'llvm>) -> Value<'llvm> {
+        debug_assert!(lhs.is_f64(), "fcmplt: Expected f64 as lhs operand!");
+        debug_assert!(rhs.is_f64(), "fcmplt: Expected f64 as rhs operand!");
+
+        let value_ref = unsafe {
+            LLVMBuildFCmp(
+                self.builder,
+                LLVMRealPredicate::LLVMRealONE,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                b"fcmpone\0".as_ptr().cast(),
             )
         };
         Value::new(value_ref)
@@ -179,6 +213,62 @@ impl<'llvm> IRBuilder<'llvm> {
     pub fn ret(&self, ret: Value<'llvm>) {
         let ret = unsafe { LLVMBuildRet(self.builder, ret.value_ref()) };
         assert!(!ret.is_null());
+    }
+
+    /// Emit an unconditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn br(&self, dest: BasicBlock<'llvm>) {
+        let br_ref = unsafe { LLVMBuildBr(self.builder, dest.bb_ref()) };
+        assert!(!br_ref.is_null());
+    }
+
+    /// Emit a conditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn cond_br(&self, cond: Value<'llvm>, then: BasicBlock<'llvm>, else_: BasicBlock<'llvm>) {
+        let br_ref = unsafe {
+            LLVMBuildCondBr(
+                self.builder,
+                cond.value_ref(),
+                then.bb_ref(),
+                else_.bb_ref(),
+            )
+        };
+        assert!(!br_ref.is_null());
+    }
+
+    /// Emit a [phi](https://llvm.org/docs/LangRef.html#phi-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn phi(
+        &self,
+        phi_type: Type<'llvm>,
+        incoming: &[(Value<'llvm>, BasicBlock<'llvm>)],
+    ) -> Value<'llvm> {
+        let phi_ref =
+            unsafe { LLVMBuildPhi(self.builder, phi_type.type_ref(), b"phi\0".as_ptr().cast()) };
+        assert!(!phi_ref.is_null());
+
+        for (val, bb) in incoming {
+            debug_assert_eq!(
+                val.type_of().kind(),
+                phi_type.kind(),
+                "Type of incoming phi value must be the same as the type used to build the phi node."
+            );
+
+            unsafe {
+                LLVMAddIncoming(phi_ref, &mut val.value_ref() as _, &mut bb.bb_ref() as _, 1);
+            }
+        }
+
+        Value::new(phi_ref)
     }
 }
 

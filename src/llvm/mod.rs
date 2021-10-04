@@ -11,7 +11,6 @@
 use llvm_sys::{
     core::LLVMShutdown,
     error::{LLVMDisposeErrorMessage, LLVMErrorRef, LLVMGetErrorMessage},
-    prelude::LLVMBasicBlockRef,
     target::{
         LLVM_InitializeNativeAsmParser, LLVM_InitializeNativeAsmPrinter,
         LLVM_InitializeNativeTarget,
@@ -19,8 +18,8 @@ use llvm_sys::{
 };
 
 use std::ffi::CStr;
-use std::marker::PhantomData;
 
+mod basic_block;
 mod builder;
 mod lljit;
 mod module;
@@ -28,16 +27,13 @@ mod pass_manager;
 mod type_;
 mod value;
 
+pub use basic_block::BasicBlock;
 pub use builder::IRBuilder;
 pub use lljit::{LLJit, ResourceTracker};
 pub use module::Module;
 pub use pass_manager::FunctionPassManager;
 pub use type_::Type;
 pub use value::{FnValue, Value};
-
-/// Wrapper for a LLVM Basic Block.
-#[derive(Copy, Clone)]
-pub struct BasicBlock<'llvm>(LLVMBasicBlockRef, PhantomData<&'llvm ()>);
 
 struct Error<'llvm>(&'llvm mut libc::c_char);
 

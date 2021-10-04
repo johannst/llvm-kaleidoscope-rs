@@ -1,7 +1,8 @@
 use llvm_sys::{
     core::{
-        LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMDisposeModule, LLVMDoubleTypeInContext,
-        LLVMDumpModule, LLVMGetNamedFunction, LLVMModuleCreateWithNameInContext,
+        LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMCreateBasicBlockInContext,
+        LLVMDisposeModule, LLVMDoubleTypeInContext, LLVMDumpModule, LLVMGetNamedFunction,
+        LLVMModuleCreateWithNameInContext,
     },
     orc2::{
         LLVMOrcCreateNewThreadSafeContext, LLVMOrcCreateNewThreadSafeModule,
@@ -13,7 +14,6 @@ use llvm_sys::{
 };
 
 use std::convert::TryFrom;
-use std::marker::PhantomData;
 
 use super::{BasicBlock, FnValue, Type};
 use crate::SmallCStr;
@@ -176,7 +176,21 @@ impl<'llvm> Module {
         };
         assert!(!block.is_null());
 
-        BasicBlock(block, PhantomData)
+        BasicBlock::new(block)
+    }
+
+    /// Create a free-standing Basic Block without adding it to a function.
+    /// This can be added to a function at a later point in time with
+    /// [`FnValue::append_basic_block`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    pub fn create_basic_block(&self) -> BasicBlock<'llvm> {
+        let block = unsafe { LLVMCreateBasicBlockInContext(self.ctx, b"block\0".as_ptr().cast()) };
+        assert!(!block.is_null());
+
+        BasicBlock::new(block)
     }
 }
 

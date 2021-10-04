@@ -1,8 +1,9 @@
 use llvm_sys::{
     analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
     core::{
-        LLVMCountBasicBlocks, LLVMCountParams, LLVMDumpValue, LLVMGetParam, LLVMGetReturnType,
-        LLVMGetValueKind, LLVMGetValueName2, LLVMSetValueName2, LLVMTypeOf,
+        LLVMAppendExistingBasicBlock, LLVMCountBasicBlocks, LLVMCountParams, LLVMDumpValue,
+        LLVMGetParam, LLVMGetReturnType, LLVMGetValueKind, LLVMGetValueName2, LLVMSetValueName2,
+        LLVMTypeOf,
     },
     prelude::LLVMValueRef,
     LLVMTypeKind, LLVMValueKind,
@@ -12,6 +13,7 @@ use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
+use super::BasicBlock;
 use super::Type;
 
 /// Wrapper for a LLVM Value Reference.
@@ -154,6 +156,13 @@ impl<'llvm> FnValue<'llvm> {
     /// Get the number of Basic Blocks for the given function value.
     pub fn basic_blocks(&self) -> usize {
         unsafe { LLVMCountBasicBlocks(self.value_ref()) as usize }
+    }
+
+    /// Append a Basic Block to the end of the function value.
+    pub fn append_basic_block(&self, bb: BasicBlock<'llvm>) {
+        unsafe {
+            LLVMAppendExistingBasicBlock(self.value_ref(), bb.bb_ref());
+        }
     }
 
     /// Verify that the given function is valid.

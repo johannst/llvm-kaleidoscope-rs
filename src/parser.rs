@@ -13,6 +13,13 @@ pub enum ExprAST {
 
     /// Call - Expression class for function calls.
     Call(String, Vec<ExprAST>),
+
+    /// If - Expression class for if/then/else.
+    If {
+        cond: Box<ExprAST>,
+        then: Box<ExprAST>,
+        else_: Box<ExprAST>,
+    },
 }
 
 /// PrototypeAST - This class represents the "prototype" for a function,
@@ -137,8 +144,6 @@ where
                     args.push(arg);
 
                     if *self.cur_tok() == Token::Char(')') {
-                        // Eat ')' token.
-                        self.get_next_token();
                         break;
                     }
 
@@ -150,8 +155,45 @@ where
                 }
             }
 
+            assert_eq!(*self.cur_tok(), Token::Char(')'));
+            // Eat ')' token.
+            self.get_next_token();
+
             Ok(ExprAST::Call(id_name, args))
         }
+    }
+
+    /// ifexpr ::= 'if' expression 'then' expression 'else' expression
+    ///
+    /// Implement `std::unique_ptr<ExprAST> ParseIfExpr();` from the tutorial.
+    fn parse_if_expr(&mut self) -> ParseResult<ExprAST> {
+        // Consume 'if' token.
+        assert_eq!(*self.cur_tok(), Token::If);
+        self.get_next_token();
+
+        let cond = self.parse_expression()?;
+
+        if *dbg!(self.cur_tok()) != Token::Then {
+            return Err("Expected 'then'".into());
+        }
+        // Consume 'then' token.
+        self.get_next_token();
+
+        let then = self.parse_expression()?;
+
+        if *self.cur_tok() != Token::Else {
+            return Err("Expected 'else'".into());
+        }
+        // Consume 'else' token.
+        self.get_next_token();
+
+        let else_ = self.parse_expression()?;
+
+        Ok(ExprAST::If {
+            cond: Box::new(cond),
+            then: Box::new(then),
+            else_: Box::new(else_),
+        })
     }
 
     /// primary
@@ -165,6 +207,7 @@ where
             Token::Identifier(_) => self.parse_identifier_expr(),
             Token::Number(_) => self.parse_num_expr(),
             Token::Char('(') => self.parse_paren_expr(),
+            Token::If => self.parse_if_expr(),
             _ => Err("unknown token when expecting an expression".into()),
         }
     }
@@ -358,8 +401,27 @@ mod test {
     }
 
     #[test]
+    fn parse_if() {
+        let mut p = parser("if 1 then 2 else 3");
+
+        let cond = Box::new(ExprAST::Number(1f64));
+        let then = Box::new(ExprAST::Number(2f64));
+        let else_ = Box::new(ExprAST::Number(3f64));
+
+        assert_eq!(p.parse_if_expr(), Ok(ExprAST::If { cond, then, else_ }));
+
+        let mut p = parser("if foo() then bar(2) else baz(3)");
+
+        let cond = Box::new(ExprAST::Call("foo".into(), vec![]));
+        let then = Box::new(ExprAST::Call("bar".into(), vec![ExprAST::Number(2f64)]));
+        let else_ = Box::new(ExprAST::Call("baz".into(), vec![ExprAST::Number(3f64)]));
+
+        assert_eq!(p.parse_if_expr(), Ok(ExprAST::If { cond, then, else_ }));
+    }
+
+    #[test]
     fn parse_primary() {
-        let mut p = parser("1337 foop \n bla(123)");
+        let mut p = parser("1337 foop \n bla(123) \n if a then b else c");
 
         assert_eq!(p.parse_primary(), Ok(ExprAST::Number(1337f64)));
 
@@ -368,6 +430,15 @@ mod test {
         assert_eq!(
             p.parse_primary(),
             Ok(ExprAST::Call("bla".into(), vec![ExprAST::Number(123f64)]))
+        );
+
+        assert_eq!(
+            p.parse_primary(),
+            Ok(ExprAST::If {
+                cond: Box::new(ExprAST::Variable("a".into())),
+                then: Box::new(ExprAST::Variable("b".into())),
+                else_: Box::new(ExprAST::Variable("c".into())),
+            })
         );
     }
 

@@ -6,6 +6,9 @@ pub enum Token {
     Identifier(String),
     Number(f64),
     Char(char),
+    If,
+    Then,
+    Else,
 }
 
 pub struct Lexer<I>
@@ -62,6 +65,9 @@ where
             match ident.as_ref() {
                 "def" => return Token::Def,
                 "extern" => return Token::Extern,
+                "if" => return Token::If,
+                "then" => return Token::Then,
+                "else" => return Token::Else,
                 _ => {}
             }
 
@@ -177,5 +183,13 @@ mod test {
         assert_eq!(Token::Identifier("b".into()), lex.gettok());
         assert_eq!(Token::Identifier("c".into()), lex.gettok());
         assert_eq!(Token::Eof, lex.gettok());
+    }
+
+    #[test]
+    fn test_ite() {
+        let mut lex = Lexer::new("if then else".chars());
+        assert_eq!(Token::If, lex.gettok());
+        assert_eq!(Token::Then, lex.gettok());
+        assert_eq!(Token::Else, lex.gettok());
     }
 }

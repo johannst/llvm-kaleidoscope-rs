@@ -78,6 +78,78 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
                 }
                 None => Err("Unknown function referenced".into()),
             },
+            ExprAST::If { cond, then, else_ } => {
+                // For 'if' expressions we are building the following CFG.
+                //
+                //         ; cond
+                //         br
+                //          |
+                //    +-----+------+
+                //    v            v
+                //  ; then       ; else
+                //    |            |
+                //    +-----+------+
+                //          v
+                //        ; merge
+                //        phi then, else
+                //        ret phi
+
+                let cond_v = {
+                    // Codgen 'cond' expression.
+                    let v = self.codegen_expr(cond, named_values)?;
+                    // Convert condition to bool.
+                    self.builder
+                        .fcmpone(v, self.module.type_f64().const_f64(0f64))
+                };
+
+                // Get the function we are currently inserting into.
+                let the_function = self.builder.get_insert_block().get_parent();
+
+                // Create basic blocks for the 'then' / 'else' expressions as well as the return
+                // instruction ('merge').
+                //
+                // Append the 'then' basic block to the function, don't insert the 'else' and
+                // 'merge' basic blocks yet.
+                let then_bb = self.module.append_basic_block(the_function);
+                let else_bb = self.module.create_basic_block();
+                let merge_bb = self.module.create_basic_block();
+
+                // Create a conditional branch based on the result of the 'cond' expression.
+                self.builder.cond_br(cond_v, then_bb, else_bb);
+
+                // Move to 'then' basic block and codgen the 'then' expression.
+                self.builder.pos_at_end(then_bb);
+                let then_v = self.codegen_expr(then, named_values)?;
+                // Create unconditional branch to 'merge' block.
+                self.builder.br(merge_bb);
+                // Update reference to current basic block (in case the 'then' expression added new
+                // basic blocks).
+                let then_bb = self.builder.get_insert_block();
+
+                // Now append the 'else' basic block to the function.
+                the_function.append_basic_block(else_bb);
+                // Move to 'else' basic block and codgen the 'else' expression.
+                self.builder.pos_at_end(else_bb);
+                let else_v = self.codegen_expr(else_, named_values)?;
+                // Create unconditional branch to 'merge' block.
+                self.builder.br(merge_bb);
+                // Update reference to current basic block (in case the 'else' expression added new
+                // basic blocks).
+                let else_bb = self.builder.get_insert_block();
+
+                // Now append the 'merge' basic block to the function.
+                the_function.append_basic_block(merge_bb);
+                // Move to 'merge' basic block.
+                self.builder.pos_at_end(merge_bb);
+                // Codegen the phi node returning the appropriate value depending on the branch
+                // condition.
+                let phi = self.builder.phi(
+                    self.module.type_f64(),
+                    &[(then_v, then_bb), (else_v, else_bb)],
+                );
+
+                Ok(phi)
+            }
         }
     }
 
