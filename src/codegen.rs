@@ -38,7 +38,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
     fn codegen_expr(
         &self,
         expr: &ExprAST,
-        named_values: &mut HashMap<&'llvm str, Value<'llvm>>,
+        named_values: &mut HashMap<String, Value<'llvm>>,
     ) -> CodegenResult<Value<'llvm>> {
         match expr {
             ExprAST::Number(num) => Ok(self.module.type_f64().const_f64(*num)),
@@ -97,7 +97,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
                 let cond_v = {
                     // Codgen 'cond' expression.
                     let v = self.codegen_expr(cond, named_values)?;
-                    // Convert condition to bool.
+                    // Compare 'v' against '0' as 'one = ordered not equal'.
                     self.builder
                         .fcmpone(v, self.module.type_f64().const_f64(0f64))
                 };
@@ -148,7 +148,95 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
                     &[(then_v, then_bb), (else_v, else_bb)],
                 );
 
-                Ok(phi)
+                Ok(*phi)
+            }
+            ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body,
+            } => {
+                // For 'for' expression we build the following structure.
+                //
+                // entry:
+                //   init = start expression
+                //   br loop
+                // loop:
+                //   i = phi [%init, %entry], [%new_i, %loop]
+                //   ; loop body ...
+                //   new_i = increment %i by step expression
+                //   ; check end condition and branch
+                // end:
+
+                // Compute initial value for the loop variable.
+                let start_val = self.codegen_expr(start, named_values)?;
+
+                let the_function = self.builder.get_insert_block().get_parent();
+                // Get current basic block (used in the loop variable phi node).
+                let entry_bb = self.builder.get_insert_block();
+                // Add new basic block to emit loop body.
+                let loop_bb = self.module.append_basic_block(the_function);
+
+                self.builder.br(loop_bb);
+                self.builder.pos_at_end(loop_bb);
+
+                // Build phi not to pick loop variable in case we come from the 'entry' block.
+                // Which is the case when we enter the loop for the first time.
+                // We will add another incoming value once we computed the updated loop variable
+                // below.
+                let variable = self
+                    .builder
+                    .phi(self.module.type_f64(), &[(start_val, entry_bb)]);
+
+                // Insert the loop variable into the named values map that it can be referenced
+                // from the body as well as the end condition.
+                // In case the loop variable shadows an existing variable remember the shared one.
+                let old_val = named_values.insert(var.into(), *variable);
+
+                // Generate the loop body.
+                self.codegen_expr(body, named_values)?;
+
+                // Generate step value expression if available else use '1'.
+                let step_val = if let Some(step) = step {
+                    self.codegen_expr(step, named_values)?
+                } else {
+                    self.module.type_f64().const_f64(1f64)
+                };
+
+                // Increment loop variable.
+                let next_var = self.builder.fadd(*variable, step_val);
+
+                // Generate the loop end condition.
+                let end_cond = self.codegen_expr(end, named_values)?;
+                let end_cond = self
+                    .builder
+                    .fcmpone(end_cond, self.module.type_f64().const_f64(0f64));
+
+                // Get current basic block.
+                let loop_end_bb = self.builder.get_insert_block();
+                // Add new basic block following the loop.
+                let after_bb = self.module.append_basic_block(the_function);
+
+                // Register additional incoming value for the loop variable. This will choose the
+                // updated loop variable if we are iterating in the loop.
+                variable.add_incoming(next_var, loop_end_bb);
+
+                // Branch depending on the loop end condition.
+                self.builder.cond_br(end_cond, loop_bb, after_bb);
+
+                self.builder.pos_at_end(after_bb);
+
+                // Restore the shadowed variable if there was one.
+                if let Some(old_val) = old_val {
+                    // We inserted 'var' above so it must exist.
+                    *named_values.get_mut(var).unwrap() = old_val;
+                } else {
+                    named_values.remove(var);
+                }
+
+                // Loops just always return 0.
+                Ok(self.module.type_f64().const_f64(0f64))
             }
         }
     }
@@ -176,7 +264,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
     fn codegen_function(
         &mut self,
         FunctionAST(proto, body): &FunctionAST,
-        named_values: &mut HashMap<&'llvm str, Value<'llvm>>,
+        named_values: &mut HashMap<String, Value<'llvm>>,
     ) -> CodegenResult<FnValue<'llvm>> {
         // Insert the function prototype into the `fn_protos` map to keep track for re-generating
         // declarations in other modules.
@@ -199,7 +287,7 @@ impl<'llvm, 'a> Codegen<'llvm, 'a> {
         // Update the map with the current functions args.
         for idx in 0..the_function.args() {
             let arg = the_function.arg(idx);
-            named_values.insert(arg.get_name(), arg);
+            named_values.insert(arg.get_name().into(), arg);
         }
 
         // Codegen function body.

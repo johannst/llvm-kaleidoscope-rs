@@ -10,7 +10,7 @@ use llvm_sys::{
 
 use std::marker::PhantomData;
 
-use super::{BasicBlock, FnValue, Module, Type, Value};
+use super::{BasicBlock, FnValue, Module, PhiValue, Type, Value};
 
 // Definition of LLVM C API functions using our `repr(transparent)` types.
 extern "C" {
@@ -131,8 +131,8 @@ impl<'llvm> IRBuilder<'llvm> {
     ///
     /// Panics if LLVM API returns a `null` pointer.
     pub fn fcmpult(&self, lhs: Value<'llvm>, rhs: Value<'llvm>) -> Value<'llvm> {
-        debug_assert!(lhs.is_f64(), "fcmplt: Expected f64 as lhs operand!");
-        debug_assert!(rhs.is_f64(), "fcmplt: Expected f64 as rhs operand!");
+        debug_assert!(lhs.is_f64(), "fcmpult: Expected f64 as lhs operand!");
+        debug_assert!(rhs.is_f64(), "fcmpult: Expected f64 as rhs operand!");
 
         let value_ref = unsafe {
             LLVMBuildFCmp(
@@ -140,7 +140,7 @@ impl<'llvm> IRBuilder<'llvm> {
                 LLVMRealPredicate::LLVMRealULT,
                 lhs.value_ref(),
                 rhs.value_ref(),
-                b"fcmplt\0".as_ptr().cast(),
+                b"fcmpult\0".as_ptr().cast(),
             )
         };
         Value::new(value_ref)
@@ -152,8 +152,8 @@ impl<'llvm> IRBuilder<'llvm> {
     ///
     /// Panics if LLVM API returns a `null` pointer.
     pub fn fcmpone(&self, lhs: Value<'llvm>, rhs: Value<'llvm>) -> Value<'llvm> {
-        debug_assert!(lhs.is_f64(), "fcmplt: Expected f64 as lhs operand!");
-        debug_assert!(rhs.is_f64(), "fcmplt: Expected f64 as rhs operand!");
+        debug_assert!(lhs.is_f64(), "fcmone: Expected f64 as lhs operand!");
+        debug_assert!(rhs.is_f64(), "fcmone: Expected f64 as rhs operand!");
 
         let value_ref = unsafe {
             LLVMBuildFCmp(
@@ -251,7 +251,7 @@ impl<'llvm> IRBuilder<'llvm> {
         &self,
         phi_type: Type<'llvm>,
         incoming: &[(Value<'llvm>, BasicBlock<'llvm>)],
-    ) -> Value<'llvm> {
+    ) -> PhiValue<'llvm> {
         let phi_ref =
             unsafe { LLVMBuildPhi(self.builder, phi_type.type_ref(), b"phi\0".as_ptr().cast()) };
         assert!(!phi_ref.is_null());
@@ -268,7 +268,7 @@ impl<'llvm> IRBuilder<'llvm> {
             }
         }
 
-        Value::new(phi_ref)
+        PhiValue::new(phi_ref)
     }
 }
 

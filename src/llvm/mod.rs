@@ -33,7 +33,7 @@ pub use lljit::{LLJit, ResourceTracker};
 pub use module::Module;
 pub use pass_manager::FunctionPassManager;
 pub use type_::Type;
-pub use value::{FnValue, Value};
+pub use value::{FnValue, PhiValue, Value};
 
 struct Error<'llvm>(&'llvm mut libc::c_char);
 

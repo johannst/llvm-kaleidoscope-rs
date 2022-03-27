@@ -1,9 +1,11 @@
+#![allow(unused)]
+
 use llvm_sys::{
     analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
     core::{
-        LLVMAppendExistingBasicBlock, LLVMCountBasicBlocks, LLVMCountParams, LLVMDumpValue,
-        LLVMGetParam, LLVMGetReturnType, LLVMGetValueKind, LLVMGetValueName2, LLVMSetValueName2,
-        LLVMTypeOf,
+        LLVMAddIncoming, LLVMAppendExistingBasicBlock, LLVMCountBasicBlocks, LLVMCountParams,
+        LLVMDumpValue, LLVMGetParam, LLVMGetReturnType, LLVMGetValueKind, LLVMGetValueName2,
+        LLVMIsAFunction, LLVMIsAPHINode, LLVMSetValueName2, LLVMTypeOf,
     },
     prelude::LLVMValueRef,
     LLVMTypeKind, LLVMValueKind,
@@ -41,6 +43,18 @@ impl<'llvm> Value<'llvm> {
     /// Get the LLVM value kind for the given value reference.
     pub(super) fn kind(&self) -> LLVMValueKind {
         unsafe { LLVMGetValueKind(self.value_ref()) }
+    }
+
+    /// Check if value is `function` type.
+    pub(super) fn is_function(&self) -> bool {
+        let cast = unsafe { LLVMIsAFunction(self.value_ref()) };
+        !cast.is_null()
+    }
+
+    /// Check if value is `phinode` type.
+    pub(super) fn is_phinode(&self) -> bool {
+        let cast = unsafe { LLVMIsAPHINode(self.value_ref()) };
+        !cast.is_null()
     }
 
     /// Dump the LLVM Value to stdout.
@@ -117,9 +131,8 @@ impl<'llvm> FnValue<'llvm> {
     /// Panics if `value_ref` is a null pointer.
     pub(super) fn new(value_ref: LLVMValueRef) -> Self {
         let value = Value::new(value_ref);
-        debug_assert_eq!(
-            value.kind(),
-            LLVMValueKind::LLVMFunctionValueKind,
+        debug_assert!(
+            value.is_function(),
             "Expected a fn value when constructing FnValue!"
         );
 
@@ -172,6 +185,53 @@ impl<'llvm> FnValue<'llvm> {
                 self.value_ref(),
                 LLVMVerifierFailureAction::LLVMPrintMessageAction,
             ) == 0
+        }
+    }
+}
+
+/// Wrapper for a LLVM Value Reference specialized for contexts where phi values are needed.
+#[derive(Copy, Clone)]
+#[repr(transparent)]
+pub struct PhiValue<'llvm>(Value<'llvm>);
+
+impl<'llvm> Deref for PhiValue<'llvm> {
+    type Target = Value<'llvm>;
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl<'llvm> PhiValue<'llvm> {
+    /// Create a new PhiValue instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `value_ref` is a null pointer.
+    pub(super) fn new(value_ref: LLVMValueRef) -> Self {
+        let value = Value::new(value_ref);
+        debug_assert!(
+            value.is_phinode(),
+            "Expected a phinode value when constructing PhiValue!"
+        );
+
+        PhiValue(value)
+    }
+
+    /// Add an incoming value to the end of a PHI list.
+    pub fn add_incoming(&self, ival: Value<'llvm>, ibb: BasicBlock<'llvm>) {
+        debug_assert_eq!(
+            ival.type_of().kind(),
+            self.type_of().kind(),
+            "Type of incoming phi value must be the same as the type used to build the phi node."
+        );
+
+        unsafe {
+            LLVMAddIncoming(
+                self.value_ref(),
+                &mut ival.value_ref() as _,
+                &mut ibb.bb_ref() as _,
+                1,
+            );
         }
     }
 }

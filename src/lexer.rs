@@ -9,6 +9,8 @@ pub enum Token {
     If,
     Then,
     Else,
+    For,
+    In,
 }
 
 pub struct Lexer<I>
@@ -68,6 +70,8 @@ where
                 "if" => return Token::If,
                 "then" => return Token::Then,
                 "else" => return Token::Else,
+                "for" => return Token::For,
+                "in" => return Token::In,
                 _ => {}
             }
 
@@ -191,5 +195,12 @@ mod test {
         assert_eq!(Token::If, lex.gettok());
         assert_eq!(Token::Then, lex.gettok());
         assert_eq!(Token::Else, lex.gettok());
+    }
+
+    #[test]
+    fn test_for() {
+        let mut lex = Lexer::new("for in".chars());
+        assert_eq!(Token::For, lex.gettok());
+        assert_eq!(Token::In, lex.gettok());
     }
 }

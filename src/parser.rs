@@ -20,6 +20,15 @@ pub enum ExprAST {
         then: Box<ExprAST>,
         else_: Box<ExprAST>,
     },
+
+    /// ForExprAST - Expression class for for/in.
+    For {
+        var: String,
+        start: Box<ExprAST>,
+        end: Box<ExprAST>,
+        step: Option<Box<ExprAST>>,
+        body: Box<ExprAST>,
+    },
 }
 
 /// PrototypeAST - This class represents the "prototype" for a function,
@@ -196,6 +205,64 @@ where
         })
     }
 
+    /// forexpr ::= 'for' identifier '=' expr ',' expr (',' expr)? 'in' expression
+    ///
+    /// Implement `std::unique_ptr<ExprAST> ParseForExpr();` from the tutorial.
+    fn parse_for_expr(&mut self) -> ParseResult<ExprAST> {
+        // Consume the 'for' token.
+        assert_eq!(*self.cur_tok(), Token::For);
+        self.get_next_token();
+
+        let var = match self
+            .parse_identifier_expr()
+            .map_err(|_| String::from("expected identifier after 'for'"))?
+        {
+            ExprAST::Variable(var) => var,
+            _ => unreachable!(),
+        };
+
+        // Consume the '=' token.
+        if *self.cur_tok() != Token::Char('=') {
+            return Err("expected '=' after for".into());
+        }
+        self.get_next_token();
+
+        let start = self.parse_expression()?;
+
+        // Consume the ',' token.
+        if *self.cur_tok() != Token::Char(',') {
+            return Err("expected ',' after for start value".into());
+        }
+        self.get_next_token();
+
+        let end = self.parse_expression()?;
+
+        let step = if *self.cur_tok() == Token::Char(',') {
+            // Consume the ',' token.
+            self.get_next_token();
+
+            Some(self.parse_expression()?)
+        } else {
+            None
+        };
+
+        // Consume the 'in' token.
+        if *self.cur_tok() != Token::In {
+            return Err("expected 'in' after for".into());
+        }
+        self.get_next_token();
+
+        let body = self.parse_expression()?;
+
+        Ok(ExprAST::For {
+            var,
+            start: Box::new(start),
+            end: Box::new(end),
+            step: step.map(|s| Box::new(s)),
+            body: Box::new(body),
+        })
+    }
+
     /// primary
     ///   ::= identifierexpr
     ///   ::= numberexpr
@@ -208,6 +275,7 @@ where
             Token::Number(_) => self.parse_num_expr(),
             Token::Char('(') => self.parse_paren_expr(),
             Token::If => self.parse_if_expr(),
+            Token::For => self.parse_for_expr(),
             _ => Err("unknown token when expecting an expression".into()),
         }
     }
@@ -420,8 +488,52 @@ mod test {
     }
 
     #[test]
+    fn parse_for() {
+        let mut p = parser("for i = 1, 2, 3 in 4");
+
+        let var = String::from("i");
+        let start = Box::new(ExprAST::Number(1f64));
+        let end = Box::new(ExprAST::Number(2f64));
+        let step = Some(Box::new(ExprAST::Number(3f64)));
+        let body = Box::new(ExprAST::Number(4f64));
+
+        assert_eq!(
+            p.parse_for_expr(),
+            Ok(ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body
+            })
+        );
+    }
+
+    #[test]
+    fn parse_for_no_step() {
+        let mut p = parser("for i = 1, 2 in 4");
+
+        let var = String::from("i");
+        let start = Box::new(ExprAST::Number(1f64));
+        let end = Box::new(ExprAST::Number(2f64));
+        let step = None;
+        let body = Box::new(ExprAST::Number(4f64));
+
+        assert_eq!(
+            p.parse_for_expr(),
+            Ok(ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body
+            })
+        );
+    }
+
+    #[test]
     fn parse_primary() {
-        let mut p = parser("1337 foop \n bla(123) \n if a then b else c");
+        let mut p = parser("1337 foop \n bla(123) \n if a then b else c \n for x=1,2 in 3");
 
         assert_eq!(p.parse_primary(), Ok(ExprAST::Number(1337f64)));
 
@@ -438,6 +550,17 @@ mod test {
                 cond: Box::new(ExprAST::Variable("a".into())),
                 then: Box::new(ExprAST::Variable("b".into())),
                 else_: Box::new(ExprAST::Variable("c".into())),
+            })
+        );
+
+        assert_eq!(
+            p.parse_primary(),
+            Ok(ExprAST::For {
+                var: String::from("x"),
+                start: Box::new(ExprAST::Number(1f64)),
+                end: Box::new(ExprAST::Number(2f64)),
+                step: None,
+                body: Box::new(ExprAST::Number(3f64)),
             })
         );
     }
