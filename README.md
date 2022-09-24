@@ -36,6 +36,16 @@ going to use the llvm `C` API and build our own safe wrapper specialized for
 this tutorial. The wrapper offers a similar interface as the `C++` API and is
 implemented in [`src/llvm/`](src/llvm/)
 
+## Demo
+
+```bash
+# Run kaleidoscope program from file.
+cargo run ks/<file>
+
+# Run REPL loop, parsing from stdin.
+cargo run
+```
+
 ## Documentation
 
 Rustdoc for this crate is available at

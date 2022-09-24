@@ -130,17 +130,10 @@ where
     module.dump();
 }
 
-fn main() {
-    println!("Parse stdin.");
-    println!("ENTER to parse current input.");
-    println!("C-d   to exit.");
-
-    // Create lexer over stdin.
-    let lexer = Lexer::new(std::io::stdin().bytes().filter_map(|v| {
-        let v = v.ok()?;
-        Some(v.into())
-    }));
-
+fn run_kaleidoscope<I>(lexer: Lexer<I>)
+where
+    I: Iterator<Item = char>,
+{
     // Create parser for kaleidoscope.
     let mut parser = Parser::new(lexer);
 
@@ -154,4 +147,36 @@ fn main() {
 
     // De-allocate managed static LLVM data.
     llvm::shutdown();
+}
+
+fn main() {
+    match std::env::args().nth(1) {
+        Some(file) => {
+            println!("Parse {}.", file);
+
+            // Create lexer over file.
+            let lexer = Lexer::new(
+                std::fs::File::open(&file)
+                    .expect(&format!("Failed to open file {}!", file))
+                    .bytes()
+                    .filter_map(|v| {
+                        let v = v.ok()?;
+                        Some(v.into())
+                    }),
+            );
+            run_kaleidoscope(lexer);
+        }
+        None => {
+            println!("Parse stdin.");
+            println!("ENTER to parse current input.");
+            println!("C-d   to exit.");
+
+            // Create lexer over stdin.
+            let lexer = Lexer::new(std::io::stdin().bytes().filter_map(|v| {
+                let v = v.ok()?;
+                Some(v.into())
+            }));
+            run_kaleidoscope(lexer);
+        }
+    }
 }
