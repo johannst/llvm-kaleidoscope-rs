@@ -5,4 +5,4 @@ edition = "2018"
 
 [dependencies]
 libc     = "0.2"
-llvm-sys = {version = "140.0", features = ["strict-versioning"]}
+llvm-sys = {version = "120.0", features = ["strict-versioning"]}
