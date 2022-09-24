@@ -7,7 +7,16 @@ use llvm_kaleidoscope_rs::{
 };
 
 use std::collections::HashMap;
-use std::io::Read;
+use std::io::{Read, Write};
+
+#[no_mangle]
+#[inline(never)]
+pub extern "C" fn putchard(c: libc::c_double) -> f64 {
+    std::io::stdout()
+        .write(&[c as u8])
+        .expect("Failed to write to stdout!");
+    0f64
+}
 
 fn main_loop<I>(mut parser: Parser<I>)
 where
