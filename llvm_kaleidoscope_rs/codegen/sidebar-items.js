@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Codegen","Code generator from kaleidoscope AST to LLVM IR."]]});
+window.SIDEBAR_ITEMS = {"struct":[["Codegen","Code generator from kaleidoscope AST to LLVM IR."]]};
