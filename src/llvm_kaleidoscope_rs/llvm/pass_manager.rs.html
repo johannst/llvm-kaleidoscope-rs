@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/pass_manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pass_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/pass_manager.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>pass_manager.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -79,81 +73,80 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">llvm_sys</span>::{
-    <span class="ident">core</span>::{
-        <span class="ident">LLVMCreateFunctionPassManagerForModule</span>, <span class="ident">LLVMDisposePassManager</span>,
-        <span class="ident">LLVMInitializeFunctionPassManager</span>, <span class="ident">LLVMRunFunctionPassManager</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+    core::{
+        LLVMCreateFunctionPassManagerForModule, LLVMDisposePassManager,
+        LLVMInitializeFunctionPassManager, LLVMRunFunctionPassManager,
     },
-    <span class="ident">prelude::LLVMPassManagerRef</span>,
-    <span class="ident">transforms</span>::{
-        <span class="ident">instcombine::LLVMAddInstructionCombiningPass</span>,
-        <span class="ident">scalar</span>::{<span class="ident">LLVMAddCFGSimplificationPass</span>, <span class="ident">LLVMAddNewGVNPass</span>, <span class="ident">LLVMAddReassociatePass</span>},
+    prelude::LLVMPassManagerRef,
+    transforms::{
+        instcombine::LLVMAddInstructionCombiningPass,
+        scalar::{LLVMAddCFGSimplificationPass, LLVMAddNewGVNPass, LLVMAddReassociatePass},
     },
 };
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">FnValue</span>, <span class="ident">Module</span>};
+<span class="kw">use super</span>::{FnValue, Module};
 
-<span class="doccomment">/// Wrapper for a LLVM Function PassManager (legacy).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FunctionPassManager</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="ident">fpm</span>: <span class="ident">LLVMPassManagerRef</span>,
-    <span class="ident">_ctx</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> ()<span class="op">&gt;</span>,
+<span class="doccomment">/// Wrapper for a LLVM Function PassManager (legacy).
+</span><span class="kw">pub struct </span>FunctionPassManager&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    fpm: LLVMPassManagerRef,
+    _ctx: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>()&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">FunctionPassManager</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new Function PassManager with the following optimization passes</span>
-    <span class="doccomment">/// - InstructionCombiningPass</span>
-    <span class="doccomment">/// - ReassociatePass</span>
-    <span class="doccomment">/// - NewGVNPass</span>
-    <span class="doccomment">/// - CFGSimplificationPass</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// The list of selected optimization passes is taken from the tutorial chapter [LLVM</span>
-    <span class="doccomment">/// Optimization Passes](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html#id3).</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ctx</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="ident">Module</span>) -&gt; <span class="ident">FunctionPassManager</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">fpm</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// Borrows module reference.</span>
-            <span class="ident">LLVMCreateFunctionPassManagerForModule</span>(<span class="ident">module</span>.<span class="ident">module</span>())
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; FunctionPassManager&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="doccomment">/// Create a new Function PassManager with the following optimization passes
+    /// - InstructionCombiningPass
+    /// - ReassociatePass
+    /// - NewGVNPass
+    /// - CFGSimplificationPass
+    ///
+    /// The list of selected optimization passes is taken from the tutorial chapter [LLVM
+    /// Optimization Passes](https://llvm.org/docs/tutorial/MyFirstLanguageFrontend/LangImpl04.html#id3).
+    </span><span class="kw">pub fn </span>with_ctx(module: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>Module) -&gt; FunctionPassManager&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>fpm = <span class="kw">unsafe </span>{
+            <span class="comment">// Borrows module reference.
+            </span>LLVMCreateFunctionPassManagerForModule(module.module())
         };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">fpm</span>.<span class="ident">is_null</span>());
+        <span class="macro">assert!</span>(!fpm.is_null());
 
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Do simple &quot;peephole&quot; optimizations and bit-twiddling optzns.</span>
-            <span class="ident">LLVMAddInstructionCombiningPass</span>(<span class="ident">fpm</span>);
-            <span class="comment">// Reassociate expressions.</span>
-            <span class="ident">LLVMAddReassociatePass</span>(<span class="ident">fpm</span>);
-            <span class="comment">// Eliminate Common SubExpressions.</span>
-            <span class="ident">LLVMAddNewGVNPass</span>(<span class="ident">fpm</span>);
-            <span class="comment">// Simplify the control flow graph (deleting unreachable blocks, etc).</span>
-            <span class="ident">LLVMAddCFGSimplificationPass</span>(<span class="ident">fpm</span>);
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Do simple &quot;peephole&quot; optimizations and bit-twiddling optzns.
+            </span>LLVMAddInstructionCombiningPass(fpm);
+            <span class="comment">// Reassociate expressions.
+            </span>LLVMAddReassociatePass(fpm);
+            <span class="comment">// Eliminate Common SubExpressions.
+            </span>LLVMAddNewGVNPass(fpm);
+            <span class="comment">// Simplify the control flow graph (deleting unreachable blocks, etc).
+            </span>LLVMAddCFGSimplificationPass(fpm);
 
-            <span class="kw">let</span> <span class="ident">fail</span> <span class="op">=</span> <span class="ident">LLVMInitializeFunctionPassManager</span>(<span class="ident">fpm</span>);
-            <span class="macro">assert_eq!</span>(<span class="ident">fail</span>, <span class="number">0</span>);
+            <span class="kw">let </span>fail = LLVMInitializeFunctionPassManager(fpm);
+            <span class="macro">assert_eq!</span>(fail, <span class="number">0</span>);
         }
 
-        <span class="ident">FunctionPassManager</span> {
-            <span class="ident">fpm</span>,
-            <span class="ident">_ctx</span>: <span class="ident">PhantomData</span>,
+        FunctionPassManager {
+            fpm,
+            _ctx: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Run the optimization passes registered with the Function PassManager on the function</span>
-    <span class="doccomment">/// referenced by `fn_value`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="self">self</span>, <span class="ident">fn_value</span>: <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// Returns 1 if any of the passes modified the function, false otherwise.</span>
-            <span class="ident">LLVMRunFunctionPassManager</span>(<span class="self">self</span>.<span class="ident">fpm</span>, <span class="ident">fn_value</span>.<span class="ident">value_ref</span>());
+    <span class="doccomment">/// Run the optimization passes registered with the Function PassManager on the function
+    /// referenced by `fn_value`.
+    </span><span class="kw">pub fn </span>run(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="self">self</span>, fn_value: FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// Returns 1 if any of the passes modified the function, false otherwise.
+            </span>LLVMRunFunctionPassManager(<span class="self">self</span>.fpm, fn_value.value_ref());
         }
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">FunctionPassManager</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMDisposePassManager</span>(<span class="self">self</span>.<span class="ident">fpm</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>FunctionPassManager&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            LLVMDisposePassManager(<span class="self">self</span>.fpm);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

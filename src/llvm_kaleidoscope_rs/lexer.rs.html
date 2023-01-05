@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lexer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/lexer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lexer.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -210,212 +204,211 @@
 <span id="204">204</span>
 <span id="205">205</span>
 <span id="206">206</span>
-</pre><pre class="rust"><code><span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Token</span> {
-    <span class="ident">Eof</span>,
-    <span class="ident">Def</span>,
-    <span class="ident">Extern</span>,
-    <span class="ident">Identifier</span>(<span class="ident">String</span>),
-    <span class="ident">Number</span>(<span class="ident">f64</span>),
-    <span class="ident">Char</span>(<span class="ident">char</span>),
-    <span class="ident">If</span>,
-    <span class="ident">Then</span>,
-    <span class="ident">Else</span>,
-    <span class="ident">For</span>,
-    <span class="ident">In</span>,
+</pre><pre class="rust"><code><span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub enum </span>Token {
+    Eof,
+    Def,
+    Extern,
+    Identifier(String),
+    Number(f64),
+    Char(char),
+    If,
+    Then,
+    Else,
+    For,
+    In,
 }
 
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Lexer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
+<span class="kw">pub struct </span>Lexer&lt;I&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = char&gt;,
 {
-    <span class="ident">input</span>: <span class="ident">I</span>,
-    <span class="ident">last_char</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span>,
+    input: I,
+    last_char: <span class="prelude-ty">Option</span>&lt;char&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Lexer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I&gt; Lexer&lt;I&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = char&gt;,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">input</span>: <span class="ident">I</span>) -&gt; <span class="ident">Lexer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">last_char</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">next</span>();
-        <span class="ident">Lexer</span> { <span class="ident">input</span>, <span class="ident">last_char</span> }
+    <span class="kw">pub fn </span>new(<span class="kw-2">mut </span>input: I) -&gt; Lexer&lt;I&gt; {
+        <span class="kw">let </span>last_char = input.next();
+        Lexer { input, last_char }
     }
 
-    <span class="kw">fn</span> <span class="ident">step</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">char</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">last_char</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">input</span>.<span class="ident">next</span>();
-        <span class="self">self</span>.<span class="ident">last_char</span>
+    <span class="kw">fn </span>step(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; <span class="prelude-ty">Option</span>&lt;char&gt; {
+        <span class="self">self</span>.last_char = <span class="self">self</span>.input.next();
+        <span class="self">self</span>.last_char
     }
 
-    <span class="doccomment">/// Lex and return the next token.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `int gettok();` from the tutorial.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">gettok</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">Token</span> {
-        <span class="comment">// Eat up whitespaces.</span>
-        <span class="kw">while</span> <span class="macro">matches!</span>(<span class="self">self</span>.<span class="ident">last_char</span>, <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_whitespace</span>()) {
-            <span class="self">self</span>.<span class="ident">step</span>();
+    <span class="doccomment">/// Lex and return the next token.
+    ///
+    /// Implement `int gettok();` from the tutorial.
+    </span><span class="kw">pub fn </span>gettok(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; Token {
+        <span class="comment">// Eat up whitespaces.
+        </span><span class="kw">while </span><span class="macro">matches!</span>(<span class="self">self</span>.last_char, <span class="prelude-val">Some</span>(c) <span class="kw">if </span>c.is_ascii_whitespace()) {
+            <span class="self">self</span>.step();
         }
 
-        <span class="comment">// Unpack last char or return EOF.</span>
-        <span class="kw">let</span> <span class="ident">last_char</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_char</span> {
-            <span class="ident">c</span>
-        } <span class="kw">else</span> {
-            <span class="kw">return</span> <span class="ident">Token::Eof</span>;
+        <span class="comment">// Unpack last char or return EOF.
+        </span><span class="kw">let </span>last_char = <span class="kw">if let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.last_char {
+            c
+        } <span class="kw">else </span>{
+            <span class="kw">return </span>Token::Eof;
         };
 
-        <span class="comment">// Identifier: [a-zA-Z][a-zA-Z0-9]*</span>
-        <span class="kw">if</span> <span class="ident">last_char</span>.<span class="ident">is_ascii_alphabetic</span>() {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ident</span> <span class="op">=</span> <span class="ident">String::new</span>();
-            <span class="ident">ident</span>.<span class="ident">push</span>(<span class="ident">last_char</span>);
+        <span class="comment">// Identifier: [a-zA-Z][a-zA-Z0-9]*
+        </span><span class="kw">if </span>last_char.is_ascii_alphabetic() {
+            <span class="kw">let </span><span class="kw-2">mut </span>ident = String::new();
+            ident.push(last_char);
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">step</span>() {
-                <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_alphanumeric</span>() {
-                    <span class="ident">ident</span>.<span class="ident">push</span>(<span class="ident">c</span>)
-                } <span class="kw">else</span> {
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.step() {
+                <span class="kw">if </span>c.is_ascii_alphanumeric() {
+                    ident.push(c)
+                } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="kw">match</span> <span class="ident">ident</span>.<span class="ident">as_ref</span>() {
-                <span class="string">&quot;def&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::Def</span>,
-                <span class="string">&quot;extern&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::Extern</span>,
-                <span class="string">&quot;if&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::If</span>,
-                <span class="string">&quot;then&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::Then</span>,
-                <span class="string">&quot;else&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::Else</span>,
-                <span class="string">&quot;for&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::For</span>,
-                <span class="string">&quot;in&quot;</span> =&gt; <span class="kw">return</span> <span class="ident">Token::In</span>,
-                <span class="kw">_</span> =&gt; {}
+            <span class="kw">match </span>ident.as_ref() {
+                <span class="string">&quot;def&quot; </span>=&gt; <span class="kw">return </span>Token::Def,
+                <span class="string">&quot;extern&quot; </span>=&gt; <span class="kw">return </span>Token::Extern,
+                <span class="string">&quot;if&quot; </span>=&gt; <span class="kw">return </span>Token::If,
+                <span class="string">&quot;then&quot; </span>=&gt; <span class="kw">return </span>Token::Then,
+                <span class="string">&quot;else&quot; </span>=&gt; <span class="kw">return </span>Token::Else,
+                <span class="string">&quot;for&quot; </span>=&gt; <span class="kw">return </span>Token::For,
+                <span class="string">&quot;in&quot; </span>=&gt; <span class="kw">return </span>Token::In,
+                <span class="kw">_ </span>=&gt; {}
             }
 
-            <span class="kw">return</span> <span class="ident">Token::Identifier</span>(<span class="ident">ident</span>);
+            <span class="kw">return </span>Token::Identifier(ident);
         }
 
-        <span class="comment">// Number: [0-9.]+</span>
-        <span class="kw">if</span> <span class="ident">last_char</span>.<span class="ident">is_ascii_digit</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">last_char</span> <span class="op">==</span> <span class="string">&#39;.&#39;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">String::new</span>();
-            <span class="ident">num</span>.<span class="ident">push</span>(<span class="ident">last_char</span>);
+        <span class="comment">// Number: [0-9.]+
+        </span><span class="kw">if </span>last_char.is_ascii_digit() || last_char == <span class="string">&#39;.&#39; </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>num = String::new();
+            num.push(last_char);
 
-            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">step</span>() {
-                <span class="kw">if</span> <span class="ident">c</span>.<span class="ident">is_ascii_digit</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;.&#39;</span> {
-                    <span class="ident">num</span>.<span class="ident">push</span>(<span class="ident">c</span>)
-                } <span class="kw">else</span> {
+            <span class="kw">while let </span><span class="prelude-val">Some</span>(c) = <span class="self">self</span>.step() {
+                <span class="kw">if </span>c.is_ascii_digit() || c == <span class="string">&#39;.&#39; </span>{
+                    num.push(c)
+                } <span class="kw">else </span>{
                     <span class="kw">break</span>;
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">num</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="ident">num</span>.<span class="ident">parse</span>().<span class="ident">unwrap_or_default</span>();
-            <span class="kw">return</span> <span class="ident">Token::Number</span>(<span class="ident">num</span>);
+            <span class="kw">let </span>num: f64 = num.parse().unwrap_or_default();
+            <span class="kw">return </span>Token::Number(num);
         }
 
-        <span class="comment">// Eat up comment.</span>
-        <span class="kw">if</span> <span class="ident">last_char</span> <span class="op">==</span> <span class="string">&#39;#&#39;</span> {
-            <span class="kw">loop</span> {
-                <span class="kw">match</span> <span class="self">self</span>.<span class="ident">step</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">c</span>) <span class="kw">if</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\r&#39;</span> <span class="op">|</span><span class="op">|</span> <span class="ident">c</span> <span class="op">==</span> <span class="string">&#39;\n&#39;</span> =&gt; <span class="kw">return</span> <span class="self">self</span>.<span class="ident">gettok</span>(),
-                    <span class="prelude-val">None</span> =&gt; <span class="kw">return</span> <span class="ident">Token::Eof</span>,
-                    <span class="kw">_</span> =&gt; { <span class="comment">/* consume comment */</span> }
+        <span class="comment">// Eat up comment.
+        </span><span class="kw">if </span>last_char == <span class="string">&#39;#&#39; </span>{
+            <span class="kw">loop </span>{
+                <span class="kw">match </span><span class="self">self</span>.step() {
+                    <span class="prelude-val">Some</span>(c) <span class="kw">if </span>c == <span class="string">&#39;\r&#39; </span>|| c == <span class="string">&#39;\n&#39; </span>=&gt; <span class="kw">return </span><span class="self">self</span>.gettok(),
+                    <span class="prelude-val">None </span>=&gt; <span class="kw">return </span>Token::Eof,
+                    <span class="kw">_ </span>=&gt; { <span class="comment">/* consume comment */ </span>}
                 }
             }
         }
 
-        <span class="comment">// Advance last char and return currently last char.</span>
-        <span class="self">self</span>.<span class="ident">step</span>();
-        <span class="ident">Token::Char</span>(<span class="ident">last_char</span>)
+        <span class="comment">// Advance last char and return currently last char.
+        </span><span class="self">self</span>.step();
+        Token::Char(last_char)
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Lexer</span>, <span class="ident">Token</span>};
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{Lexer, Token};
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_identifier</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;a b c&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_identifier() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;a b c&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;a&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;b&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;c&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_keyword</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;def extern&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Def</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Extern</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_keyword() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;def extern&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Def, lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Extern, lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_number</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;12.34&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Number</span>(<span class="number">12.34f64</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_number() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;12.34&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Number(<span class="number">12.34f64</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot; 1.0   2.0 3.0&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Number</span>(<span class="number">1.0f64</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Number</span>(<span class="number">2.0f64</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Number</span>(<span class="number">3.0f64</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot; 1.0   2.0 3.0&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Number(<span class="number">1.0f64</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Number(<span class="number">2.0f64</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Number(<span class="number">3.0f64</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;12.34.56&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Number</span>(<span class="number">0f64</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;12.34.56&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Number(<span class="number">0f64</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_comment</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;# some comment&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_comment() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;# some comment&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;abc # some comment \n xyz&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;abc&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;xyz&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;abc # some comment \n xyz&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;abc&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;xyz&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_chars</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;a+b-c&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Char</span>(<span class="string">&#39;+&#39;</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Char</span>(<span class="string">&#39;-&#39;</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_chars() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;a+b-c&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;a&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Char(<span class="string">&#39;+&#39;</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;b&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Char(<span class="string">&#39;-&#39;</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;c&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_whitespaces</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;    +a  b      c!    &quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Char</span>(<span class="string">&#39;+&#39;</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Char</span>(<span class="string">&#39;!&#39;</span>), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_whitespaces() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;    +a  b      c!    &quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Char(<span class="string">&#39;+&#39;</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;a&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;b&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;c&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Char(<span class="string">&#39;!&#39;</span>), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;\n    a \n\r  b \r \n     c \r\r  \n   &quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Identifier</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>()), <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Eof</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;\n    a \n\r  b \r \n     c \r\r  \n   &quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;a&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;b&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Identifier(<span class="string">&quot;c&quot;</span>.into()), lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Eof, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_ite</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;if then else&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::If</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Then</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::Else</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_ite() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;if then else&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::If, lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Then, lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::Else, lex.gettok());
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_for</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lex</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="string">&quot;for in&quot;</span>.<span class="ident">chars</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::For</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
-        <span class="macro">assert_eq!</span>(<span class="ident">Token::In</span>, <span class="ident">lex</span>.<span class="ident">gettok</span>());
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>test_for() {
+        <span class="kw">let </span><span class="kw-2">mut </span>lex = Lexer::new(<span class="string">&quot;for in&quot;</span>.chars());
+        <span class="macro">assert_eq!</span>(Token::For, lex.gettok());
+        <span class="macro">assert_eq!</span>(Token::In, lex.gettok());
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

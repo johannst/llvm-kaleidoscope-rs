@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/lljit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lljit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/lljit.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lljit.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -158,160 +152,159 @@
 <span id="152">152</span>
 <span id="153">153</span>
 <span id="154">154</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">llvm_sys::orc2</span>::{
-    <span class="ident">lljit</span>::{
-        <span class="ident">LLVMOrcCreateLLJIT</span>, <span class="ident">LLVMOrcLLJITAddLLVMIRModuleWithRT</span>, <span class="ident">LLVMOrcLLJITGetGlobalPrefix</span>,
-        <span class="ident">LLVMOrcLLJITGetMainJITDylib</span>, <span class="ident">LLVMOrcLLJITLookup</span>, <span class="ident">LLVMOrcLLJITRef</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>llvm_sys::orc2::{
+    lljit::{
+        LLVMOrcCreateLLJIT, LLVMOrcLLJITAddLLVMIRModuleWithRT, LLVMOrcLLJITGetGlobalPrefix,
+        LLVMOrcLLJITGetMainJITDylib, LLVMOrcLLJITLookup, LLVMOrcLLJITRef,
     },
-    <span class="ident">LLVMOrcCreateDynamicLibrarySearchGeneratorForProcess</span>, <span class="ident">LLVMOrcDefinitionGeneratorRef</span>,
-    <span class="ident">LLVMOrcJITDylibAddGenerator</span>, <span class="ident">LLVMOrcJITDylibCreateResourceTracker</span>, <span class="ident">LLVMOrcJITDylibRef</span>,
-    <span class="ident">LLVMOrcReleaseResourceTracker</span>, <span class="ident">LLVMOrcResourceTrackerRef</span>, <span class="ident">LLVMOrcResourceTrackerRemove</span>,
+    LLVMOrcCreateDynamicLibrarySearchGeneratorForProcess, LLVMOrcDefinitionGeneratorRef,
+    LLVMOrcJITDylibAddGenerator, LLVMOrcJITDylibCreateResourceTracker, LLVMOrcJITDylibRef,
+    LLVMOrcReleaseResourceTracker, LLVMOrcResourceTrackerRef, LLVMOrcResourceTrackerRemove,
 };
 
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::convert::TryFrom;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Error</span>, <span class="ident">Module</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SmallCStr</span>;
+<span class="kw">use super</span>::{Error, Module};
+<span class="kw">use </span><span class="kw">crate</span>::SmallCStr;
 
-<span class="doccomment">/// Marker trait to constrain function signatures that can be looked up in the JIT.</span>
-<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">JitFn</span> {}
+<span class="doccomment">/// Marker trait to constrain function signatures that can be looked up in the JIT.
+</span><span class="kw">pub trait </span>JitFn {}
 
-<span class="kw">impl</span> <span class="ident">JitFn</span> <span class="kw">for</span> <span class="kw">unsafe</span> <span class="kw">extern</span> <span class="string">&quot;C&quot;</span> <span class="kw">fn</span>() -&gt; <span class="ident">f64</span> {}
+<span class="kw">impl </span>JitFn <span class="kw">for unsafe extern </span><span class="string">&quot;C&quot; </span><span class="kw">fn</span>() -&gt; f64 {}
 
-<span class="doccomment">/// Wrapper for a LLVM [LLJIT](https://www.llvm.org/docs/ORCv2.html#lljit-and-lllazyjit).</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LLJit</span> {
-    <span class="ident">jit</span>: <span class="ident">LLVMOrcLLJITRef</span>,
-    <span class="ident">dylib</span>: <span class="ident">LLVMOrcJITDylibRef</span>,
+<span class="doccomment">/// Wrapper for a LLVM [LLJIT](https://www.llvm.org/docs/ORCv2.html#lljit-and-lllazyjit).
+</span><span class="kw">pub struct </span>LLJit {
+    jit: LLVMOrcLLJITRef,
+    dylib: LLVMOrcJITDylibRef,
 }
 
-<span class="kw">impl</span> <span class="ident">LLJit</span> {
-    <span class="doccomment">/// Create a new LLJit instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer or an error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="ident">LLJit</span> {
-        <span class="kw">let</span> (<span class="ident">jit</span>, <span class="ident">dylib</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">jit</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">LLVMOrcCreateLLJIT</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">jit</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="ident">std::ptr::null_mut</span>(), <span class="comment">/* builder: nullptr -&gt; default */</span>
-            );
+<span class="kw">impl </span>LLJit {
+    <span class="doccomment">/// Create a new LLJit instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer or an error.
+    </span><span class="kw">pub fn </span>new() -&gt; LLJit {
+        <span class="kw">let </span>(jit, dylib) = <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>jit = std::ptr::null_mut();
+            <span class="kw">let </span>err = LLVMOrcCreateLLJIT(
+                <span class="kw-2">&amp;mut </span>jit <span class="kw">as _</span>,
+                std::ptr::null_mut(), <span class="comment">/* builder: nullptr -&gt; default */
+            </span>);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">err</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = Error::from(err) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, err.as_str());
             }
 
-            <span class="kw">let</span> <span class="ident">dylib</span> <span class="op">=</span> <span class="ident">LLVMOrcLLJITGetMainJITDylib</span>(<span class="ident">jit</span>);
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">dylib</span>.<span class="ident">is_null</span>());
+            <span class="kw">let </span>dylib = LLVMOrcLLJITGetMainJITDylib(jit);
+            <span class="macro">assert!</span>(!dylib.is_null());
 
-            (<span class="ident">jit</span>, <span class="ident">dylib</span>)
+            (jit, dylib)
         };
 
-        <span class="ident">LLJit</span> { <span class="ident">jit</span>, <span class="ident">dylib</span> }
+        LLJit { jit, dylib }
     }
 
-    <span class="doccomment">/// Add an LLVM IR module to the JIT. Return a [`ResourceTracker`], which when dropped, will</span>
-    <span class="doccomment">/// remove the code of the LLVM IR module from the JIT.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer or an error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">module</span>: <span class="ident">Module</span>) -&gt; <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">tsmod</span> <span class="op">=</span> <span class="ident">module</span>.<span class="ident">into_raw_thread_safe_module</span>();
+    <span class="doccomment">/// Add an LLVM IR module to the JIT. Return a [`ResourceTracker`], which when dropped, will
+    /// remove the code of the LLVM IR module from the JIT.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer or an error.
+    </span><span class="kw">pub fn </span>add_module(<span class="kw-2">&amp;</span><span class="self">self</span>, module: Module) -&gt; ResourceTracker&lt;<span class="lifetime">&#39;_</span>&gt; {
+        <span class="kw">let </span>tsmod = module.into_raw_thread_safe_module();
 
-        <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">rt</span> <span class="op">=</span> <span class="ident">LLVMOrcJITDylibCreateResourceTracker</span>(<span class="self">self</span>.<span class="ident">dylib</span>);
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">LLVMOrcLLJITAddLLVMIRModuleWithRT</span>(<span class="self">self</span>.<span class="ident">jit</span>, <span class="ident">rt</span>, <span class="ident">tsmod</span>);
+        <span class="kw">let </span>rt = <span class="kw">unsafe </span>{
+            <span class="kw">let </span>rt = LLVMOrcJITDylibCreateResourceTracker(<span class="self">self</span>.dylib);
+            <span class="kw">let </span>err = LLVMOrcLLJITAddLLVMIRModuleWithRT(<span class="self">self</span>.jit, rt, tsmod);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">err</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = Error::from(err) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, err.as_str());
             }
 
-            <span class="ident">rt</span>
+            rt
         };
 
-        <span class="ident">ResourceTracker::new</span>(<span class="ident">rt</span>)
+        ResourceTracker::new(rt)
     }
 
-    <span class="doccomment">/// Find the symbol with the name `sym` in the JIT.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if the symbol is not found in the JIT.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_symbol</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">JitFn</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">sym</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">F</span> {
-        <span class="kw">let</span> <span class="ident">sym</span> <span class="op">=</span>
-            <span class="ident">SmallCStr::try_from</span>(<span class="ident">sym</span>).<span class="ident">expect</span>(<span class="string">&quot;Failed to convert &#39;sym&#39; argument to small C string!&quot;</span>);
+    <span class="doccomment">/// Find the symbol with the name `sym` in the JIT.
+    ///
+    /// # Panics
+    ///
+    /// Panics if the symbol is not found in the JIT.
+    </span><span class="kw">pub fn </span>find_symbol&lt;F: JitFn&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, sym: <span class="kw-2">&amp;</span>str) -&gt; F {
+        <span class="kw">let </span>sym =
+            SmallCStr::try_from(sym).expect(<span class="string">&quot;Failed to convert &#39;sym&#39; argument to small C string!&quot;</span>);
 
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">addr</span> <span class="op">=</span> <span class="number">0u64</span>;
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">LLVMOrcLLJITLookup</span>(<span class="self">self</span>.<span class="ident">jit</span>, <span class="kw-2">&amp;mut</span> <span class="ident">addr</span> <span class="kw">as</span> <span class="kw">_</span>, <span class="ident">sym</span>.<span class="ident">as_ptr</span>());
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>addr = <span class="number">0u64</span>;
+            <span class="kw">let </span>err = LLVMOrcLLJITLookup(<span class="self">self</span>.jit, <span class="kw-2">&amp;mut </span>addr <span class="kw">as _</span>, sym.as_ptr());
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">err</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = Error::from(err) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, err.as_str());
             }
 
-            <span class="macro">debug_assert_eq!</span>(<span class="ident">core::mem::size_of_val</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>), <span class="ident">core::mem::size_of</span>::<span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>());
-            <span class="ident">std::mem::transmute_copy</span>(<span class="kw-2">&amp;</span><span class="ident">addr</span>)
+            <span class="macro">debug_assert_eq!</span>(core::mem::size_of_val(<span class="kw-2">&amp;</span>addr), core::mem::size_of::&lt;F&gt;());
+            std::mem::transmute_copy(<span class="kw-2">&amp;</span>addr)
         }
     }
 
-    <span class="doccomment">/// Enable lookup of dynamic symbols available in the current process from the JIT.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns an error.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">enable_process_symbols</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">proc_syms_gen</span>: <span class="ident">LLVMOrcDefinitionGeneratorRef</span> <span class="op">=</span> <span class="ident">std::ptr::null_mut</span>();
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">LLVMOrcCreateDynamicLibrarySearchGeneratorForProcess</span>(
-                <span class="kw-2">&amp;mut</span> <span class="ident">proc_syms_gen</span> <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="self">self</span>.<span class="ident">global_prefix</span>(),
-                <span class="prelude-val">None</span>,                 <span class="comment">/* filter */</span>
-                <span class="ident">std::ptr::null_mut</span>(), <span class="comment">/* filter ctx */</span>
-            );
+    <span class="doccomment">/// Enable lookup of dynamic symbols available in the current process from the JIT.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns an error.
+    </span><span class="kw">pub fn </span>enable_process_symbols(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>proc_syms_gen: LLVMOrcDefinitionGeneratorRef = std::ptr::null_mut();
+            <span class="kw">let </span>err = LLVMOrcCreateDynamicLibrarySearchGeneratorForProcess(
+                <span class="kw-2">&amp;mut </span>proc_syms_gen <span class="kw">as _</span>,
+                <span class="self">self</span>.global_prefix(),
+                <span class="prelude-val">None</span>,                 <span class="comment">/* filter */
+                </span>std::ptr::null_mut(), <span class="comment">/* filter ctx */
+            </span>);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">err</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = Error::from(err) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, err.as_str());
             }
 
-            <span class="ident">LLVMOrcJITDylibAddGenerator</span>(<span class="self">self</span>.<span class="ident">dylib</span>, <span class="ident">proc_syms_gen</span>);
+            LLVMOrcJITDylibAddGenerator(<span class="self">self</span>.dylib, proc_syms_gen);
         }
     }
 
-    <span class="doccomment">/// Return the global prefix character according to the LLJITs data layout.</span>
-    <span class="kw">fn</span> <span class="ident">global_prefix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">libc::c_char</span> {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMOrcLLJITGetGlobalPrefix</span>(<span class="self">self</span>.<span class="ident">jit</span>) }
+    <span class="doccomment">/// Return the global prefix character according to the LLJITs data layout.
+    </span><span class="kw">fn </span>global_prefix(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; libc::c_char {
+        <span class="kw">unsafe </span>{ LLVMOrcLLJITGetGlobalPrefix(<span class="self">self</span>.jit) }
     }
 }
 
-<span class="doccomment">/// A resource handle for code added to an [`LLJit`] instance.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// When a `ResourceTracker` handle is dropped, the code corresponding to the handle will be</span>
-<span class="doccomment">/// removed from the JIT.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span>(<span class="ident">LLVMOrcResourceTrackerRef</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;jit</span> ()<span class="op">&gt;</span>);
+<span class="doccomment">/// A resource handle for code added to an [`LLJit`] instance.
+///
+/// When a `ResourceTracker` handle is dropped, the code corresponding to the handle will be
+/// removed from the JIT.
+</span><span class="kw">pub struct </span>ResourceTracker&lt;<span class="lifetime">&#39;jit</span>&gt;(LLVMOrcResourceTrackerRef, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;jit </span>()&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span> <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">rt</span>: <span class="ident">LLVMOrcResourceTrackerRef</span>) -&gt; <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;jit</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">rt</span>.<span class="ident">is_null</span>());
-        <span class="ident">ResourceTracker</span>(<span class="ident">rt</span>, <span class="ident">PhantomData</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;jit</span>&gt; ResourceTracker&lt;<span class="lifetime">&#39;jit</span>&gt; {
+    <span class="kw">fn </span>new(rt: LLVMOrcResourceTrackerRef) -&gt; ResourceTracker&lt;<span class="lifetime">&#39;jit</span>&gt; {
+        <span class="macro">assert!</span>(!rt.is_null());
+        ResourceTracker(rt, PhantomData)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">ResourceTracker</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="ident">err</span> <span class="op">=</span> <span class="ident">LLVMOrcResourceTrackerRemove</span>(<span class="self">self</span>.<span class="number">0</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>ResourceTracker&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="kw">let </span>err = LLVMOrcResourceTrackerRemove(<span class="self">self</span>.<span class="number">0</span>);
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>) <span class="op">=</span> <span class="ident">Error::from</span>(<span class="ident">err</span>) {
-                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, <span class="ident">err</span>.<span class="ident">as_str</span>());
+            <span class="kw">if let </span><span class="prelude-val">Some</span>(err) = Error::from(err) {
+                <span class="macro">panic!</span>(<span class="string">&quot;Error: {}&quot;</span>, err.as_str());
             }
 
-            <span class="ident">LLVMOrcReleaseResourceTracker</span>(<span class="self">self</span>.<span class="number">0</span>);
+            LLVMOrcReleaseResourceTracker(<span class="self">self</span>.<span class="number">0</span>);
         };
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

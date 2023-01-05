@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/builder.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>builder.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -283,285 +277,284 @@
 <span id="277">277</span>
 <span id="278">278</span>
 <span id="279">279</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">llvm_sys</span>::{
-    <span class="ident">core</span>::{
-        <span class="ident">LLVMAddIncoming</span>, <span class="ident">LLVMBuildBr</span>, <span class="ident">LLVMBuildCondBr</span>, <span class="ident">LLVMBuildFAdd</span>, <span class="ident">LLVMBuildFCmp</span>, <span class="ident">LLVMBuildFMul</span>,
-        <span class="ident">LLVMBuildFSub</span>, <span class="ident">LLVMBuildPhi</span>, <span class="ident">LLVMBuildRet</span>, <span class="ident">LLVMBuildUIToFP</span>, <span class="ident">LLVMCreateBuilderInContext</span>,
-        <span class="ident">LLVMDisposeBuilder</span>, <span class="ident">LLVMGetInsertBlock</span>, <span class="ident">LLVMPositionBuilderAtEnd</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+    core::{
+        LLVMAddIncoming, LLVMBuildBr, LLVMBuildCondBr, LLVMBuildFAdd, LLVMBuildFCmp, LLVMBuildFMul,
+        LLVMBuildFSub, LLVMBuildPhi, LLVMBuildRet, LLVMBuildUIToFP, LLVMCreateBuilderInContext,
+        LLVMDisposeBuilder, LLVMGetInsertBlock, LLVMPositionBuilderAtEnd,
     },
-    <span class="ident">prelude</span>::{<span class="ident">LLVMBuilderRef</span>, <span class="ident">LLVMValueRef</span>},
-    <span class="ident">LLVMRealPredicate</span>,
+    prelude::{LLVMBuilderRef, LLVMValueRef},
+    LLVMRealPredicate,
 };
 
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
+<span class="kw">use </span>std::marker::PhantomData;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BasicBlock</span>, <span class="ident">FnValue</span>, <span class="ident">Module</span>, <span class="ident">PhiValue</span>, <span class="ident">Type</span>, <span class="ident">Value</span>};
+<span class="kw">use super</span>::{BasicBlock, FnValue, Module, PhiValue, Type, Value};
 
-<span class="comment">// Definition of LLVM C API functions using our `repr(transparent)` types.</span>
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">LLVMBuildCall2</span>(
-        <span class="ident">arg1</span>: <span class="ident">LLVMBuilderRef</span>,
-        <span class="ident">arg2</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">Fn</span>: <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">Args</span>: <span class="kw-2">*mut</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">NumArgs</span>: <span class="ident">::libc::c_uint</span>,
-        <span class="ident">Name</span>: <span class="kw-2">*const</span> <span class="ident">::libc::c_char</span>,
-    ) -&gt; <span class="ident">LLVMValueRef</span>;
+<span class="comment">// Definition of LLVM C API functions using our `repr(transparent)` types.
+</span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">fn </span>LLVMBuildCall2(
+        arg1: LLVMBuilderRef,
+        arg2: Type&lt;<span class="lifetime">&#39;_</span>&gt;,
+        Fn: FnValue&lt;<span class="lifetime">&#39;_</span>&gt;,
+        Args: <span class="kw-2">*mut </span>Value&lt;<span class="lifetime">&#39;_</span>&gt;,
+        NumArgs: ::libc::c_uint,
+        Name: <span class="kw-2">*const </span>::libc::c_char,
+    ) -&gt; LLVMValueRef;
 }
 
-<span class="doccomment">/// Wrapper for a LLVM IR Builder.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">IRBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="ident">builder</span>: <span class="ident">LLVMBuilderRef</span>,
-    <span class="ident">_ctx</span>: <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> ()<span class="op">&gt;</span>,
+<span class="doccomment">/// Wrapper for a LLVM IR Builder.
+</span><span class="kw">pub struct </span>IRBuilder&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    builder: LLVMBuilderRef,
+    _ctx: PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>()&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">IRBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new LLVM IR Builder with the `module`s context.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if creating the IR Builder fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ctx</span>(<span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="ident">Module</span>) -&gt; <span class="ident">IRBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">builder</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMCreateBuilderInContext</span>(<span class="ident">module</span>.<span class="ident">ctx</span>()) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">builder</span>.<span class="ident">is_null</span>());
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; IRBuilder&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="doccomment">/// Create a new LLVM IR Builder with the `module`s context.
+    ///
+    /// # Panics
+    ///
+    /// Panics if creating the IR Builder fails.
+    </span><span class="kw">pub fn </span>with_ctx(module: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>Module) -&gt; IRBuilder&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>builder = <span class="kw">unsafe </span>{ LLVMCreateBuilderInContext(module.ctx()) };
+        <span class="macro">assert!</span>(!builder.is_null());
 
-        <span class="ident">IRBuilder</span> {
-            <span class="ident">builder</span>,
-            <span class="ident">_ctx</span>: <span class="ident">PhantomData</span>,
+        IRBuilder {
+            builder,
+            _ctx: PhantomData,
         }
     }
 
-    <span class="doccomment">/// Position the IR Builder at the end of the given Basic Block.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">pos_at_end</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bb</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMPositionBuilderAtEnd</span>(<span class="self">self</span>.<span class="ident">builder</span>, <span class="ident">bb</span>.<span class="ident">bb_ref</span>());
+    <span class="doccomment">/// Position the IR Builder at the end of the given Basic Block.
+    </span><span class="kw">pub fn </span>pos_at_end(<span class="kw-2">&amp;</span><span class="self">self</span>, bb: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">unsafe </span>{
+            LLVMPositionBuilderAtEnd(<span class="self">self</span>.builder, bb.bb_ref());
         }
     }
 
-    <span class="doccomment">/// Get the BasicBlock the IRBuilder currently inputs into.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_insert_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">bb_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMGetInsertBlock</span>(<span class="self">self</span>.<span class="ident">builder</span>) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">bb_ref</span>.<span class="ident">is_null</span>());
+    <span class="doccomment">/// Get the BasicBlock the IRBuilder currently inputs into.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>get_insert_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>bb_ref = <span class="kw">unsafe </span>{ LLVMGetInsertBlock(<span class="self">self</span>.builder) };
+        <span class="macro">assert!</span>(!bb_ref.is_null());
 
-        <span class="ident">BasicBlock::new</span>(<span class="ident">bb_ref</span>)
+        BasicBlock::new(bb_ref)
     }
 
-    <span class="doccomment">/// Emit a [fadd](https://llvm.org/docs/LangRef.html#fadd-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fadd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">rhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">lhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fadd: Expected f64 as lhs operand!&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">rhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fadd: Expected f64 as rhs operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [fadd](https://llvm.org/docs/LangRef.html#fadd-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>fadd(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, rhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(lhs.is_f64(), <span class="string">&quot;fadd: Expected f64 as lhs operand!&quot;</span>);
+        <span class="macro">debug_assert!</span>(rhs.is_f64(), <span class="string">&quot;fadd: Expected f64 as rhs operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildFAdd</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">lhs</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">rhs</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;fadd\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildFAdd(
+                <span class="self">self</span>.builder,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                <span class="string">b&quot;fadd\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [fsub](https://llvm.org/docs/LangRef.html#fsub-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fsub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">rhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">lhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fsub: Expected f64 as lhs operand!&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">rhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fsub: Expected f64 as rhs operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [fsub](https://llvm.org/docs/LangRef.html#fsub-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>fsub(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, rhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(lhs.is_f64(), <span class="string">&quot;fsub: Expected f64 as lhs operand!&quot;</span>);
+        <span class="macro">debug_assert!</span>(rhs.is_f64(), <span class="string">&quot;fsub: Expected f64 as rhs operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildFSub</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">lhs</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">rhs</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;fsub\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildFSub(
+                <span class="self">self</span>.builder,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                <span class="string">b&quot;fsub\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [fmul](https://llvm.org/docs/LangRef.html#fmul-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fmul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">rhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">lhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fmul: Expected f64 as lhs operand!&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">rhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fmul: Expected f64 as rhs operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [fmul](https://llvm.org/docs/LangRef.html#fmul-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>fmul(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, rhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(lhs.is_f64(), <span class="string">&quot;fmul: Expected f64 as lhs operand!&quot;</span>);
+        <span class="macro">debug_assert!</span>(rhs.is_f64(), <span class="string">&quot;fmul: Expected f64 as rhs operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildFMul</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">lhs</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">rhs</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;fmul\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildFMul(
+                <span class="self">self</span>.builder,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                <span class="string">b&quot;fmul\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [fcmpult](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fcmpult</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">rhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">lhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fcmpult: Expected f64 as lhs operand!&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">rhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fcmpult: Expected f64 as rhs operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [fcmpult](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>fcmpult(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, rhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(lhs.is_f64(), <span class="string">&quot;fcmpult: Expected f64 as lhs operand!&quot;</span>);
+        <span class="macro">debug_assert!</span>(rhs.is_f64(), <span class="string">&quot;fcmpult: Expected f64 as rhs operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildFCmp</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">LLVMRealPredicate::LLVMRealULT</span>,
-                <span class="ident">lhs</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">rhs</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;fcmpult\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildFCmp(
+                <span class="self">self</span>.builder,
+                LLVMRealPredicate::LLVMRealULT,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                <span class="string">b&quot;fcmpult\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [fcmpone](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fcmpone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">rhs</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">lhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fcmone: Expected f64 as lhs operand!&quot;</span>);
-        <span class="macro">debug_assert!</span>(<span class="ident">rhs</span>.<span class="ident">is_f64</span>(), <span class="string">&quot;fcmone: Expected f64 as rhs operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [fcmpone](https://llvm.org/docs/LangRef.html#fcmp-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>fcmpone(<span class="kw-2">&amp;</span><span class="self">self</span>, lhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, rhs: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(lhs.is_f64(), <span class="string">&quot;fcmone: Expected f64 as lhs operand!&quot;</span>);
+        <span class="macro">debug_assert!</span>(rhs.is_f64(), <span class="string">&quot;fcmone: Expected f64 as rhs operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildFCmp</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">LLVMRealPredicate::LLVMRealONE</span>,
-                <span class="ident">lhs</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">rhs</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;fcmpone\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildFCmp(
+                <span class="self">self</span>.builder,
+                LLVMRealPredicate::LLVMRealONE,
+                lhs.value_ref(),
+                rhs.value_ref(),
+                <span class="string">b&quot;fcmpone\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [uitofp](https://llvm.org/docs/LangRef.html#uitofp-to-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">uitofp</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">val</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">dest_type</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">debug_assert!</span>(<span class="ident">val</span>.<span class="ident">is_int</span>(), <span class="string">&quot;uitofp: Expected integer operand!&quot;</span>);
+    <span class="doccomment">/// Emit a [uitofp](https://llvm.org/docs/LangRef.html#uitofp-to-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>uitofp(<span class="kw-2">&amp;</span><span class="self">self</span>, val: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, dest_type: Type&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">debug_assert!</span>(val.is_int(), <span class="string">&quot;uitofp: Expected integer operand!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildUIToFP</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">val</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">dest_type</span>.<span class="ident">type_ref</span>(),
-                <span class="string">b&quot;uitofp\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildUIToFP(
+                <span class="self">self</span>.builder,
+                val.value_ref(),
+                dest_type.type_ref(),
+                <span class="string">b&quot;uitofp\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [call](https://llvm.org/docs/LangRef.html#call-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">call</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">fn_value</span>: <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>]) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildCall2</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">fn_value</span>.<span class="ident">ret_type</span>(),
-                <span class="ident">fn_value</span>,
-                <span class="ident">args</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">args</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">libc::c_uint</span>,
-                <span class="string">b&quot;call\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+    <span class="doccomment">/// Emit a [call](https://llvm.org/docs/LangRef.html#call-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>call(<span class="kw-2">&amp;</span><span class="self">self</span>, fn_value: FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;, args: <span class="kw-2">&amp;mut </span>[Value&lt;<span class="lifetime">&#39;llvm</span>&gt;]) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{
+            LLVMBuildCall2(
+                <span class="self">self</span>.builder,
+                fn_value.ret_type(),
+                fn_value,
+                args.as_mut_ptr(),
+                args.len() <span class="kw">as </span>libc::c_uint,
+                <span class="string">b&quot;call\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Emit a [ret](https://llvm.org/docs/LangRef.html#ret-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ret</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ret</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">ret</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMBuildRet</span>(<span class="self">self</span>.<span class="ident">builder</span>, <span class="ident">ret</span>.<span class="ident">value_ref</span>()) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">ret</span>.<span class="ident">is_null</span>());
+    <span class="doccomment">/// Emit a [ret](https://llvm.org/docs/LangRef.html#ret-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>ret(<span class="kw-2">&amp;</span><span class="self">self</span>, ret: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">let </span>ret = <span class="kw">unsafe </span>{ LLVMBuildRet(<span class="self">self</span>.builder, ret.value_ref()) };
+        <span class="macro">assert!</span>(!ret.is_null());
     }
 
-    <span class="doccomment">/// Emit an unconditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">br</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">dest</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">br_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMBuildBr</span>(<span class="self">self</span>.<span class="ident">builder</span>, <span class="ident">dest</span>.<span class="ident">bb_ref</span>()) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">br_ref</span>.<span class="ident">is_null</span>());
+    <span class="doccomment">/// Emit an unconditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>br(<span class="kw-2">&amp;</span><span class="self">self</span>, dest: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">let </span>br_ref = <span class="kw">unsafe </span>{ LLVMBuildBr(<span class="self">self</span>.builder, dest.bb_ref()) };
+        <span class="macro">assert!</span>(!br_ref.is_null());
     }
 
-    <span class="doccomment">/// Emit a conditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cond_br</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cond</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">then</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">else_</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">let</span> <span class="ident">br_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMBuildCondBr</span>(
-                <span class="self">self</span>.<span class="ident">builder</span>,
-                <span class="ident">cond</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">then</span>.<span class="ident">bb_ref</span>(),
-                <span class="ident">else_</span>.<span class="ident">bb_ref</span>(),
+    <span class="doccomment">/// Emit a conditional [br](https://llvm.org/docs/LangRef.html#br-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>cond_br(<span class="kw-2">&amp;</span><span class="self">self</span>, cond: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, then: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;, else_: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">let </span>br_ref = <span class="kw">unsafe </span>{
+            LLVMBuildCondBr(
+                <span class="self">self</span>.builder,
+                cond.value_ref(),
+                then.bb_ref(),
+                else_.bb_ref(),
             )
         };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">br_ref</span>.<span class="ident">is_null</span>());
+        <span class="macro">assert!</span>(!br_ref.is_null());
     }
 
-    <span class="doccomment">/// Emit a [phi](https://llvm.org/docs/LangRef.html#phi-instruction) instruction.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">phi</span>(
+    <span class="doccomment">/// Emit a [phi](https://llvm.org/docs/LangRef.html#phi-instruction) instruction.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>phi(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">phi_type</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>,
-        <span class="ident">incoming</span>: <span class="kw-2">&amp;</span>[(<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>)],
-    ) -&gt; <span class="ident">PhiValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">phi_ref</span> <span class="op">=</span>
-            <span class="kw">unsafe</span> { <span class="ident">LLVMBuildPhi</span>(<span class="self">self</span>.<span class="ident">builder</span>, <span class="ident">phi_type</span>.<span class="ident">type_ref</span>(), <span class="string">b&quot;phi\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>()) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">phi_ref</span>.<span class="ident">is_null</span>());
+        phi_type: Type&lt;<span class="lifetime">&#39;llvm</span>&gt;,
+        incoming: <span class="kw-2">&amp;</span>[(Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;)],
+    ) -&gt; PhiValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>phi_ref =
+            <span class="kw">unsafe </span>{ LLVMBuildPhi(<span class="self">self</span>.builder, phi_type.type_ref(), <span class="string">b&quot;phi\0&quot;</span>.as_ptr().cast()) };
+        <span class="macro">assert!</span>(!phi_ref.is_null());
 
-        <span class="kw">for</span> (<span class="ident">val</span>, <span class="ident">bb</span>) <span class="kw">in</span> <span class="ident">incoming</span> {
+        <span class="kw">for </span>(val, bb) <span class="kw">in </span>incoming {
             <span class="macro">debug_assert_eq!</span>(
-                <span class="ident">val</span>.<span class="ident">type_of</span>().<span class="ident">kind</span>(),
-                <span class="ident">phi_type</span>.<span class="ident">kind</span>(),
-                <span class="string">&quot;Type of incoming phi value must be the same as the type used to build the phi node.&quot;</span>
-            );
+                val.type_of().kind(),
+                phi_type.kind(),
+                <span class="string">&quot;Type of incoming phi value must be the same as the type used to build the phi node.&quot;
+            </span>);
 
-            <span class="kw">unsafe</span> {
-                <span class="ident">LLVMAddIncoming</span>(<span class="ident">phi_ref</span>, <span class="kw-2">&amp;mut</span> <span class="ident">val</span>.<span class="ident">value_ref</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="kw-2">&amp;mut</span> <span class="ident">bb</span>.<span class="ident">bb_ref</span>() <span class="kw">as</span> <span class="kw">_</span>, <span class="number">1</span>);
+            <span class="kw">unsafe </span>{
+                LLVMAddIncoming(phi_ref, <span class="kw-2">&amp;mut </span>val.value_ref() <span class="kw">as _</span>, <span class="kw-2">&amp;mut </span>bb.bb_ref() <span class="kw">as _</span>, <span class="number">1</span>);
             }
         }
 
-        <span class="ident">PhiValue::new</span>(<span class="ident">phi_ref</span>)
+        PhiValue::new(phi_ref)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">IRBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMDisposeBuilder</span>(<span class="self">self</span>.<span class="ident">builder</span>) }
+<span class="kw">impl </span>Drop <span class="kw">for </span>IRBuilder&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ LLVMDisposeBuilder(<span class="self">self</span>.builder) }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

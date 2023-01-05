@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/codegen.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/codegen.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>codegen.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -326,328 +320,327 @@
 <span id="320">320</span>
 <span id="321">321</span>
 <span id="322">322</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">std::collections::HashMap</span>;
+</pre><pre class="rust"><code><span class="kw">use </span>std::collections::HashMap;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::llvm</span>::{<span class="ident">FnValue</span>, <span class="ident">FunctionPassManager</span>, <span class="ident">IRBuilder</span>, <span class="ident">Module</span>, <span class="ident">Value</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::parser</span>::{<span class="ident">ExprAST</span>, <span class="ident">FunctionAST</span>, <span class="ident">PrototypeAST</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::Either</span>;
+<span class="kw">use </span><span class="kw">crate</span>::llvm::{FnValue, FunctionPassManager, IRBuilder, Module, Value};
+<span class="kw">use </span><span class="kw">crate</span>::parser::{ExprAST, FunctionAST, PrototypeAST};
+<span class="kw">use </span><span class="kw">crate</span>::Either;
 
-<span class="kw">type</span> <span class="ident">CodegenResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+<span class="kw">type </span>CodegenResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, String&gt;;
 
-<span class="doccomment">/// Code generator from kaleidoscope AST to LLVM IR.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Codegen</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="ident">Module</span>,
-    <span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">IRBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>,
-    <span class="ident">fpm</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">FunctionPassManager</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>,
-    <span class="ident">fn_protos</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw-2">mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrototypeAST</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Code generator from kaleidoscope AST to LLVM IR.
+</span><span class="kw">pub struct </span>Codegen&lt;<span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span>&gt; {
+    module: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>Module,
+    builder: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>IRBuilder&lt;<span class="lifetime">&#39;llvm</span>&gt;,
+    fpm: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span>FunctionPassManager&lt;<span class="lifetime">&#39;llvm</span>&gt;,
+    fn_protos: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a </span><span class="kw-2">mut </span>HashMap&lt;String, PrototypeAST&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Codegen</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Compile either a [`PrototypeAST`] or a [`FunctionAST`] into the LLVM `module`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compile</span>(
-        <span class="ident">module</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="ident">Module</span>,
-        <span class="ident">fn_protos</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">PrototypeAST</span><span class="op">&gt;</span>,
-        <span class="ident">compilee</span>: <span class="ident">Either</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">PrototypeAST</span>, <span class="kw-2">&amp;</span><span class="ident">FunctionAST</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CodegenResult</span><span class="op">&lt;</span><span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">cg</span> <span class="op">=</span> <span class="ident">Codegen</span> {
-            <span class="ident">module</span>,
-            <span class="ident">builder</span>: <span class="kw-2">&amp;</span><span class="ident">IRBuilder::with_ctx</span>(<span class="ident">module</span>),
-            <span class="ident">fpm</span>: <span class="kw-2">&amp;</span><span class="ident">FunctionPassManager::with_ctx</span>(<span class="ident">module</span>),
-            <span class="ident">fn_protos</span>,
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span>&gt; Codegen&lt;<span class="lifetime">&#39;llvm</span>, <span class="lifetime">&#39;a</span>&gt; {
+    <span class="doccomment">/// Compile either a [`PrototypeAST`] or a [`FunctionAST`] into the LLVM `module`.
+    </span><span class="kw">pub fn </span>compile(
+        module: <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>Module,
+        fn_protos: <span class="kw-2">&amp;mut </span>HashMap&lt;String, PrototypeAST&gt;,
+        compilee: Either&lt;<span class="kw-2">&amp;</span>PrototypeAST, <span class="kw-2">&amp;</span>FunctionAST&gt;,
+    ) -&gt; CodegenResult&lt;FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        <span class="kw">let </span><span class="kw-2">mut </span>cg = Codegen {
+            module,
+            builder: <span class="kw-2">&amp;</span>IRBuilder::with_ctx(module),
+            fpm: <span class="kw-2">&amp;</span>FunctionPassManager::with_ctx(module),
+            fn_protos,
         };
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">variables</span> <span class="op">=</span> <span class="ident">HashMap::new</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>variables = HashMap::new();
 
-        <span class="kw">match</span> <span class="ident">compilee</span> {
-            <span class="ident">Either::A</span>(<span class="ident">proto</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="ident">cg</span>.<span class="ident">codegen_prototype</span>(<span class="ident">proto</span>)),
-            <span class="ident">Either::B</span>(<span class="ident">func</span>) =&gt; <span class="ident">cg</span>.<span class="ident">codegen_function</span>(<span class="ident">func</span>, <span class="kw-2">&amp;mut</span> <span class="ident">variables</span>),
+        <span class="kw">match </span>compilee {
+            Either::A(proto) =&gt; <span class="prelude-val">Ok</span>(cg.codegen_prototype(proto)),
+            Either::B(func) =&gt; cg.codegen_function(func, <span class="kw-2">&amp;mut </span>variables),
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">codegen_expr</span>(
+    <span class="kw">fn </span>codegen_expr(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">expr</span>: <span class="kw-2">&amp;</span><span class="ident">ExprAST</span>,
-        <span class="ident">named_values</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CodegenResult</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="ident">expr</span> {
-            <span class="ident">ExprAST::Number</span>(<span class="ident">num</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>().<span class="ident">const_f64</span>(<span class="kw-2">*</span><span class="ident">num</span>)),
-            <span class="ident">ExprAST::Variable</span>(<span class="ident">name</span>) =&gt; <span class="kw">match</span> <span class="ident">named_values</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">as_str</span>()) {
-                <span class="prelude-val">Some</span>(<span class="ident">value</span>) =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">value</span>),
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown variable name&quot;</span>.<span class="ident">into</span>()),
+        expr: <span class="kw-2">&amp;</span>ExprAST,
+        named_values: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Value&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt;,
+    ) -&gt; CodegenResult&lt;Value&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        <span class="kw">match </span>expr {
+            ExprAST::Number(num) =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.module.type_f64().const_f64(<span class="kw-2">*</span>num)),
+            ExprAST::Variable(name) =&gt; <span class="kw">match </span>named_values.get(name.as_str()) {
+                <span class="prelude-val">Some</span>(value) =&gt; <span class="prelude-val">Ok</span>(<span class="kw-2">*</span>value),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown variable name&quot;</span>.into()),
             },
-            <span class="ident">ExprAST::Binary</span>(<span class="ident">binop</span>, <span class="ident">lhs</span>, <span class="ident">rhs</span>) =&gt; {
-                <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">lhs</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">rhs</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
+            ExprAST::Binary(binop, lhs, rhs) =&gt; {
+                <span class="kw">let </span>l = <span class="self">self</span>.codegen_expr(lhs, named_values)<span class="question-mark">?</span>;
+                <span class="kw">let </span>r = <span class="self">self</span>.codegen_expr(rhs, named_values)<span class="question-mark">?</span>;
 
-                <span class="kw">match</span> <span class="ident">binop</span> {
-                    <span class="string">&#39;+&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">fadd</span>(<span class="ident">l</span>, <span class="ident">r</span>)),
-                    <span class="string">&#39;-&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">fsub</span>(<span class="ident">l</span>, <span class="ident">r</span>)),
-                    <span class="string">&#39;*&#39;</span> =&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">fmul</span>(<span class="ident">l</span>, <span class="ident">r</span>)),
-                    <span class="string">&#39;&lt;&#39;</span> =&gt; {
-                        <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">fcmpult</span>(<span class="ident">l</span>, <span class="ident">r</span>);
-                        <span class="comment">// Turn bool into f64.</span>
-                        <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">uitofp</span>(<span class="ident">res</span>, <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>()))
+                <span class="kw">match </span>binop {
+                    <span class="string">&#39;+&#39; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.builder.fadd(l, r)),
+                    <span class="string">&#39;-&#39; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.builder.fsub(l, r)),
+                    <span class="string">&#39;*&#39; </span>=&gt; <span class="prelude-val">Ok</span>(<span class="self">self</span>.builder.fmul(l, r)),
+                    <span class="string">&#39;&lt;&#39; </span>=&gt; {
+                        <span class="kw">let </span>res = <span class="self">self</span>.builder.fcmpult(l, r);
+                        <span class="comment">// Turn bool into f64.
+                        </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.builder.uitofp(res, <span class="self">self</span>.module.type_f64()))
                     }
-                    <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;invalid binary operator&quot;</span>.<span class="ident">into</span>()),
+                    <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;invalid binary operator&quot;</span>.into()),
                 }
             }
-            <span class="ident">ExprAST::Call</span>(<span class="ident">callee</span>, <span class="ident">args</span>) =&gt; <span class="kw">match</span> <span class="self">self</span>.<span class="ident">get_function</span>(<span class="ident">callee</span>) {
-                <span class="prelude-val">Some</span>(<span class="ident">callee</span>) =&gt; {
-                    <span class="kw">if</span> <span class="ident">callee</span>.<span class="ident">args</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">args</span>.<span class="ident">len</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Incorrect # arguments passed&quot;</span>.<span class="ident">into</span>());
+            ExprAST::Call(callee, args) =&gt; <span class="kw">match </span><span class="self">self</span>.get_function(callee) {
+                <span class="prelude-val">Some</span>(callee) =&gt; {
+                    <span class="kw">if </span>callee.args() != args.len() {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Incorrect # arguments passed&quot;</span>.into());
                     }
 
-                    <span class="comment">// Generate code for function argument expressions.</span>
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">args</span>
-                        .<span class="ident">iter</span>()
-                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">arg</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">arg</span>, <span class="ident">named_values</span>))
-                        .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">CodegenResult</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
+                    <span class="comment">// Generate code for function argument expressions.
+                    </span><span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;Value&lt;<span class="lifetime">&#39;_</span>&gt;&gt; = args
+                        .iter()
+                        .map(|arg| <span class="self">self</span>.codegen_expr(arg, named_values))
+                        .collect::&lt;CodegenResult&lt;<span class="kw">_</span>&gt;&gt;()<span class="question-mark">?</span>;
 
-                    <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">call</span>(<span class="ident">callee</span>, <span class="kw-2">&amp;mut</span> <span class="ident">args</span>))
+                    <span class="prelude-val">Ok</span>(<span class="self">self</span>.builder.call(callee, <span class="kw-2">&amp;mut </span>args))
                 }
-                <span class="prelude-val">None</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown function referenced&quot;</span>.<span class="ident">into</span>()),
+                <span class="prelude-val">None </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;Unknown function referenced&quot;</span>.into()),
             },
-            <span class="ident">ExprAST::If</span> { <span class="ident">cond</span>, <span class="ident">then</span>, <span class="ident">else_</span> } =&gt; {
-                <span class="comment">// For &#39;if&#39; expressions we are building the following CFG.</span>
-                <span class="comment">//</span>
-                <span class="comment">//         ; cond</span>
-                <span class="comment">//         br</span>
-                <span class="comment">//          |</span>
-                <span class="comment">//    +-----+------+</span>
-                <span class="comment">//    v            v</span>
-                <span class="comment">//  ; then       ; else</span>
-                <span class="comment">//    |            |</span>
-                <span class="comment">//    +-----+------+</span>
-                <span class="comment">//          v</span>
-                <span class="comment">//        ; merge</span>
-                <span class="comment">//        phi then, else</span>
-                <span class="comment">//        ret phi</span>
+            ExprAST::If { cond, then, else_ } =&gt; {
+                <span class="comment">// For &#39;if&#39; expressions we are building the following CFG.
+                //
+                //         ; cond
+                //         br
+                //          |
+                //    +-----+------+
+                //    v            v
+                //  ; then       ; else
+                //    |            |
+                //    +-----+------+
+                //          v
+                //        ; merge
+                //        phi then, else
+                //        ret phi
 
-                <span class="kw">let</span> <span class="ident">cond_v</span> <span class="op">=</span> {
-                    <span class="comment">// Codgen &#39;cond&#39; expression.</span>
-                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">cond</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
-                    <span class="comment">// Compare &#39;v&#39; against &#39;0&#39; as &#39;one = ordered not equal&#39;.</span>
-                    <span class="self">self</span>.<span class="ident">builder</span>
-                        .<span class="ident">fcmpone</span>(<span class="ident">v</span>, <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>().<span class="ident">const_f64</span>(<span class="number">0f64</span>))
+                </span><span class="kw">let </span>cond_v = {
+                    <span class="comment">// Codgen &#39;cond&#39; expression.
+                    </span><span class="kw">let </span>v = <span class="self">self</span>.codegen_expr(cond, named_values)<span class="question-mark">?</span>;
+                    <span class="comment">// Compare &#39;v&#39; against &#39;0&#39; as &#39;one = ordered not equal&#39;.
+                    </span><span class="self">self</span>.builder
+                        .fcmpone(v, <span class="self">self</span>.module.type_f64().const_f64(<span class="number">0f64</span>))
                 };
 
-                <span class="comment">// Get the function we are currently inserting into.</span>
-                <span class="kw">let</span> <span class="ident">the_function</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>().<span class="ident">get_parent</span>();
+                <span class="comment">// Get the function we are currently inserting into.
+                </span><span class="kw">let </span>the_function = <span class="self">self</span>.builder.get_insert_block().get_parent();
 
-                <span class="comment">// Create basic blocks for the &#39;then&#39; / &#39;else&#39; expressions as well as the return</span>
-                <span class="comment">// instruction (&#39;merge&#39;).</span>
-                <span class="comment">//</span>
-                <span class="comment">// Append the &#39;then&#39; basic block to the function, don&#39;t insert the &#39;else&#39; and</span>
-                <span class="comment">// &#39;merge&#39; basic blocks yet.</span>
-                <span class="kw">let</span> <span class="ident">then_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">append_basic_block</span>(<span class="ident">the_function</span>);
-                <span class="kw">let</span> <span class="ident">else_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">create_basic_block</span>();
-                <span class="kw">let</span> <span class="ident">merge_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">create_basic_block</span>();
+                <span class="comment">// Create basic blocks for the &#39;then&#39; / &#39;else&#39; expressions as well as the return
+                // instruction (&#39;merge&#39;).
+                //
+                // Append the &#39;then&#39; basic block to the function, don&#39;t insert the &#39;else&#39; and
+                // &#39;merge&#39; basic blocks yet.
+                </span><span class="kw">let </span>then_bb = <span class="self">self</span>.module.append_basic_block(the_function);
+                <span class="kw">let </span>else_bb = <span class="self">self</span>.module.create_basic_block();
+                <span class="kw">let </span>merge_bb = <span class="self">self</span>.module.create_basic_block();
 
-                <span class="comment">// Create a conditional branch based on the result of the &#39;cond&#39; expression.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">cond_br</span>(<span class="ident">cond_v</span>, <span class="ident">then_bb</span>, <span class="ident">else_bb</span>);
+                <span class="comment">// Create a conditional branch based on the result of the &#39;cond&#39; expression.
+                </span><span class="self">self</span>.builder.cond_br(cond_v, then_bb, else_bb);
 
-                <span class="comment">// Move to &#39;then&#39; basic block and codgen the &#39;then&#39; expression.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">then_bb</span>);
-                <span class="kw">let</span> <span class="ident">then_v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">then</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
-                <span class="comment">// Create unconditional branch to &#39;merge&#39; block.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">br</span>(<span class="ident">merge_bb</span>);
-                <span class="comment">// Update reference to current basic block (in case the &#39;then&#39; expression added new</span>
-                <span class="comment">// basic blocks).</span>
-                <span class="kw">let</span> <span class="ident">then_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>();
+                <span class="comment">// Move to &#39;then&#39; basic block and codgen the &#39;then&#39; expression.
+                </span><span class="self">self</span>.builder.pos_at_end(then_bb);
+                <span class="kw">let </span>then_v = <span class="self">self</span>.codegen_expr(then, named_values)<span class="question-mark">?</span>;
+                <span class="comment">// Create unconditional branch to &#39;merge&#39; block.
+                </span><span class="self">self</span>.builder.br(merge_bb);
+                <span class="comment">// Update reference to current basic block (in case the &#39;then&#39; expression added new
+                // basic blocks).
+                </span><span class="kw">let </span>then_bb = <span class="self">self</span>.builder.get_insert_block();
 
-                <span class="comment">// Now append the &#39;else&#39; basic block to the function.</span>
-                <span class="ident">the_function</span>.<span class="ident">append_basic_block</span>(<span class="ident">else_bb</span>);
-                <span class="comment">// Move to &#39;else&#39; basic block and codgen the &#39;else&#39; expression.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">else_bb</span>);
-                <span class="kw">let</span> <span class="ident">else_v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">else_</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
-                <span class="comment">// Create unconditional branch to &#39;merge&#39; block.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">br</span>(<span class="ident">merge_bb</span>);
-                <span class="comment">// Update reference to current basic block (in case the &#39;else&#39; expression added new</span>
-                <span class="comment">// basic blocks).</span>
-                <span class="kw">let</span> <span class="ident">else_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>();
+                <span class="comment">// Now append the &#39;else&#39; basic block to the function.
+                </span>the_function.append_basic_block(else_bb);
+                <span class="comment">// Move to &#39;else&#39; basic block and codgen the &#39;else&#39; expression.
+                </span><span class="self">self</span>.builder.pos_at_end(else_bb);
+                <span class="kw">let </span>else_v = <span class="self">self</span>.codegen_expr(else_, named_values)<span class="question-mark">?</span>;
+                <span class="comment">// Create unconditional branch to &#39;merge&#39; block.
+                </span><span class="self">self</span>.builder.br(merge_bb);
+                <span class="comment">// Update reference to current basic block (in case the &#39;else&#39; expression added new
+                // basic blocks).
+                </span><span class="kw">let </span>else_bb = <span class="self">self</span>.builder.get_insert_block();
 
-                <span class="comment">// Now append the &#39;merge&#39; basic block to the function.</span>
-                <span class="ident">the_function</span>.<span class="ident">append_basic_block</span>(<span class="ident">merge_bb</span>);
-                <span class="comment">// Move to &#39;merge&#39; basic block.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">merge_bb</span>);
-                <span class="comment">// Codegen the phi node returning the appropriate value depending on the branch</span>
-                <span class="comment">// condition.</span>
-                <span class="kw">let</span> <span class="ident">phi</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">phi</span>(
-                    <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>(),
-                    <span class="kw-2">&amp;</span>[(<span class="ident">then_v</span>, <span class="ident">then_bb</span>), (<span class="ident">else_v</span>, <span class="ident">else_bb</span>)],
+                <span class="comment">// Now append the &#39;merge&#39; basic block to the function.
+                </span>the_function.append_basic_block(merge_bb);
+                <span class="comment">// Move to &#39;merge&#39; basic block.
+                </span><span class="self">self</span>.builder.pos_at_end(merge_bb);
+                <span class="comment">// Codegen the phi node returning the appropriate value depending on the branch
+                // condition.
+                </span><span class="kw">let </span>phi = <span class="self">self</span>.builder.phi(
+                    <span class="self">self</span>.module.type_f64(),
+                    <span class="kw-2">&amp;</span>[(then_v, then_bb), (else_v, else_bb)],
                 );
 
-                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span><span class="ident">phi</span>)
+                <span class="prelude-val">Ok</span>(<span class="kw-2">*</span>phi)
             }
-            <span class="ident">ExprAST::For</span> {
-                <span class="ident">var</span>,
-                <span class="ident">start</span>,
-                <span class="ident">end</span>,
-                <span class="ident">step</span>,
-                <span class="ident">body</span>,
+            ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body,
             } =&gt; {
-                <span class="comment">// For &#39;for&#39; expression we build the following structure.</span>
-                <span class="comment">//</span>
-                <span class="comment">// entry:</span>
-                <span class="comment">//   init = start expression</span>
-                <span class="comment">//   br loop</span>
-                <span class="comment">// loop:</span>
-                <span class="comment">//   i = phi [%init, %entry], [%new_i, %loop]</span>
-                <span class="comment">//   ; loop body ...</span>
-                <span class="comment">//   new_i = increment %i by step expression</span>
-                <span class="comment">//   ; check end condition and branch</span>
-                <span class="comment">// end:</span>
+                <span class="comment">// For &#39;for&#39; expression we build the following structure.
+                //
+                // entry:
+                //   init = start expression
+                //   br loop
+                // loop:
+                //   i = phi [%init, %entry], [%new_i, %loop]
+                //   ; loop body ...
+                //   new_i = increment %i by step expression
+                //   ; check end condition and branch
+                // end:
 
-                <span class="comment">// Compute initial value for the loop variable.</span>
-                <span class="kw">let</span> <span class="ident">start_val</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">start</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
+                // Compute initial value for the loop variable.
+                </span><span class="kw">let </span>start_val = <span class="self">self</span>.codegen_expr(start, named_values)<span class="question-mark">?</span>;
 
-                <span class="kw">let</span> <span class="ident">the_function</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>().<span class="ident">get_parent</span>();
-                <span class="comment">// Get current basic block (used in the loop variable phi node).</span>
-                <span class="kw">let</span> <span class="ident">entry_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>();
-                <span class="comment">// Add new basic block to emit loop body.</span>
-                <span class="kw">let</span> <span class="ident">loop_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">append_basic_block</span>(<span class="ident">the_function</span>);
+                <span class="kw">let </span>the_function = <span class="self">self</span>.builder.get_insert_block().get_parent();
+                <span class="comment">// Get current basic block (used in the loop variable phi node).
+                </span><span class="kw">let </span>entry_bb = <span class="self">self</span>.builder.get_insert_block();
+                <span class="comment">// Add new basic block to emit loop body.
+                </span><span class="kw">let </span>loop_bb = <span class="self">self</span>.module.append_basic_block(the_function);
 
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">br</span>(<span class="ident">loop_bb</span>);
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">loop_bb</span>);
+                <span class="self">self</span>.builder.br(loop_bb);
+                <span class="self">self</span>.builder.pos_at_end(loop_bb);
 
-                <span class="comment">// Build phi not to pick loop variable in case we come from the &#39;entry&#39; block.</span>
-                <span class="comment">// Which is the case when we enter the loop for the first time.</span>
-                <span class="comment">// We will add another incoming value once we computed the updated loop variable</span>
-                <span class="comment">// below.</span>
-                <span class="kw">let</span> <span class="ident">variable</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">builder</span>
-                    .<span class="ident">phi</span>(<span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>(), <span class="kw-2">&amp;</span>[(<span class="ident">start_val</span>, <span class="ident">entry_bb</span>)]);
+                <span class="comment">// Build phi not to pick loop variable in case we come from the &#39;entry&#39; block.
+                // Which is the case when we enter the loop for the first time.
+                // We will add another incoming value once we computed the updated loop variable
+                // below.
+                </span><span class="kw">let </span>variable = <span class="self">self
+                    </span>.builder
+                    .phi(<span class="self">self</span>.module.type_f64(), <span class="kw-2">&amp;</span>[(start_val, entry_bb)]);
 
-                <span class="comment">// Insert the loop variable into the named values map that it can be referenced</span>
-                <span class="comment">// from the body as well as the end condition.</span>
-                <span class="comment">// In case the loop variable shadows an existing variable remember the shared one.</span>
-                <span class="kw">let</span> <span class="ident">old_val</span> <span class="op">=</span> <span class="ident">named_values</span>.<span class="ident">insert</span>(<span class="ident">var</span>.<span class="ident">into</span>(), <span class="kw-2">*</span><span class="ident">variable</span>);
+                <span class="comment">// Insert the loop variable into the named values map that it can be referenced
+                // from the body as well as the end condition.
+                // In case the loop variable shadows an existing variable remember the shared one.
+                </span><span class="kw">let </span>old_val = named_values.insert(var.into(), <span class="kw-2">*</span>variable);
 
-                <span class="comment">// Generate the loop body.</span>
-                <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">body</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
+                <span class="comment">// Generate the loop body.
+                </span><span class="self">self</span>.codegen_expr(body, named_values)<span class="question-mark">?</span>;
 
-                <span class="comment">// Generate step value expression if available else use &#39;1&#39;.</span>
-                <span class="kw">let</span> <span class="ident">step_val</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">step</span>) <span class="op">=</span> <span class="ident">step</span> {
-                    <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">step</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>
-                } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>().<span class="ident">const_f64</span>(<span class="number">1f64</span>)
+                <span class="comment">// Generate step value expression if available else use &#39;1&#39;.
+                </span><span class="kw">let </span>step_val = <span class="kw">if let </span><span class="prelude-val">Some</span>(step) = step {
+                    <span class="self">self</span>.codegen_expr(step, named_values)<span class="question-mark">?
+                </span>} <span class="kw">else </span>{
+                    <span class="self">self</span>.module.type_f64().const_f64(<span class="number">1f64</span>)
                 };
 
-                <span class="comment">// Increment loop variable.</span>
-                <span class="kw">let</span> <span class="ident">next_var</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">fadd</span>(<span class="kw-2">*</span><span class="ident">variable</span>, <span class="ident">step_val</span>);
+                <span class="comment">// Increment loop variable.
+                </span><span class="kw">let </span>next_var = <span class="self">self</span>.builder.fadd(<span class="kw-2">*</span>variable, step_val);
 
-                <span class="comment">// Generate the loop end condition.</span>
-                <span class="kw">let</span> <span class="ident">end_cond</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">end</span>, <span class="ident">named_values</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">end_cond</span> <span class="op">=</span> <span class="self">self</span>
-                    .<span class="ident">builder</span>
-                    .<span class="ident">fcmpone</span>(<span class="ident">end_cond</span>, <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>().<span class="ident">const_f64</span>(<span class="number">0f64</span>));
+                <span class="comment">// Generate the loop end condition.
+                </span><span class="kw">let </span>end_cond = <span class="self">self</span>.codegen_expr(end, named_values)<span class="question-mark">?</span>;
+                <span class="kw">let </span>end_cond = <span class="self">self
+                    </span>.builder
+                    .fcmpone(end_cond, <span class="self">self</span>.module.type_f64().const_f64(<span class="number">0f64</span>));
 
-                <span class="comment">// Get current basic block.</span>
-                <span class="kw">let</span> <span class="ident">loop_end_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">get_insert_block</span>();
-                <span class="comment">// Add new basic block following the loop.</span>
-                <span class="kw">let</span> <span class="ident">after_bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">append_basic_block</span>(<span class="ident">the_function</span>);
+                <span class="comment">// Get current basic block.
+                </span><span class="kw">let </span>loop_end_bb = <span class="self">self</span>.builder.get_insert_block();
+                <span class="comment">// Add new basic block following the loop.
+                </span><span class="kw">let </span>after_bb = <span class="self">self</span>.module.append_basic_block(the_function);
 
-                <span class="comment">// Register additional incoming value for the loop variable. This will choose the</span>
-                <span class="comment">// updated loop variable if we are iterating in the loop.</span>
-                <span class="ident">variable</span>.<span class="ident">add_incoming</span>(<span class="ident">next_var</span>, <span class="ident">loop_end_bb</span>);
+                <span class="comment">// Register additional incoming value for the loop variable. This will choose the
+                // updated loop variable if we are iterating in the loop.
+                </span>variable.add_incoming(next_var, loop_end_bb);
 
-                <span class="comment">// Branch depending on the loop end condition.</span>
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">cond_br</span>(<span class="ident">end_cond</span>, <span class="ident">loop_bb</span>, <span class="ident">after_bb</span>);
+                <span class="comment">// Branch depending on the loop end condition.
+                </span><span class="self">self</span>.builder.cond_br(end_cond, loop_bb, after_bb);
 
-                <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">after_bb</span>);
+                <span class="self">self</span>.builder.pos_at_end(after_bb);
 
-                <span class="comment">// Restore the shadowed variable if there was one.</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">old_val</span>) <span class="op">=</span> <span class="ident">old_val</span> {
-                    <span class="comment">// We inserted &#39;var&#39; above so it must exist.</span>
-                    <span class="kw-2">*</span><span class="ident">named_values</span>.<span class="ident">get_mut</span>(<span class="ident">var</span>).<span class="ident">unwrap</span>() <span class="op">=</span> <span class="ident">old_val</span>;
-                } <span class="kw">else</span> {
-                    <span class="ident">named_values</span>.<span class="ident">remove</span>(<span class="ident">var</span>);
+                <span class="comment">// Restore the shadowed variable if there was one.
+                </span><span class="kw">if let </span><span class="prelude-val">Some</span>(old_val) = old_val {
+                    <span class="comment">// We inserted &#39;var&#39; above so it must exist.
+                    </span><span class="kw-2">*</span>named_values.get_mut(var).unwrap() = old_val;
+                } <span class="kw">else </span>{
+                    named_values.remove(var);
                 }
 
-                <span class="comment">// Loops just always return 0.</span>
-                <span class="prelude-val">Ok</span>(<span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>().<span class="ident">const_f64</span>(<span class="number">0f64</span>))
+                <span class="comment">// Loops just always return 0.
+                </span><span class="prelude-val">Ok</span>(<span class="self">self</span>.module.type_f64().const_f64(<span class="number">0f64</span>))
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">codegen_prototype</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">PrototypeAST</span>(<span class="ident">name</span>, <span class="ident">args</span>): <span class="kw-2">&amp;</span><span class="ident">PrototypeAST</span>) -&gt; <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_f64</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_f64</span>();
+    <span class="kw">fn </span>codegen_prototype(<span class="kw-2">&amp;</span><span class="self">self</span>, PrototypeAST(name, args): <span class="kw-2">&amp;</span>PrototypeAST) -&gt; FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>type_f64 = <span class="self">self</span>.module.type_f64();
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">doubles</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="ident">doubles</span>.<span class="ident">resize</span>(<span class="ident">args</span>.<span class="ident">len</span>(), <span class="ident">type_f64</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>doubles = Vec::new();
+        doubles.resize(args.len(), type_f64);
 
-        <span class="comment">// Build the function type: fn(f64, f64, ..) -&gt; f64</span>
-        <span class="kw">let</span> <span class="ident">ft</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">type_fn</span>(<span class="kw-2">&amp;mut</span> <span class="ident">doubles</span>, <span class="ident">type_f64</span>);
+        <span class="comment">// Build the function type: fn(f64, f64, ..) -&gt; f64
+        </span><span class="kw">let </span>ft = <span class="self">self</span>.module.type_fn(<span class="kw-2">&amp;mut </span>doubles, type_f64);
 
-        <span class="comment">// Create the function declaration.</span>
-        <span class="kw">let</span> <span class="ident">f</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">add_fn</span>(<span class="ident">name</span>, <span class="ident">ft</span>);
+        <span class="comment">// Create the function declaration.
+        </span><span class="kw">let </span>f = <span class="self">self</span>.module.add_fn(name, ft);
 
-        <span class="comment">// Set the names of the function arguments.</span>
-        <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">f</span>.<span class="ident">args</span>() {
-            <span class="ident">f</span>.<span class="ident">arg</span>(<span class="ident">idx</span>).<span class="ident">set_name</span>(<span class="kw-2">&amp;</span><span class="ident">args</span>[<span class="ident">idx</span>]);
+        <span class="comment">// Set the names of the function arguments.
+        </span><span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..f.args() {
+            f.arg(idx).set_name(<span class="kw-2">&amp;</span>args[idx]);
         }
 
-        <span class="ident">f</span>
+        f
     }
 
-    <span class="kw">fn</span> <span class="ident">codegen_function</span>(
-        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
-        <span class="ident">FunctionAST</span>(<span class="ident">proto</span>, <span class="ident">body</span>): <span class="kw-2">&amp;</span><span class="ident">FunctionAST</span>,
-        <span class="ident">named_values</span>: <span class="kw-2">&amp;mut</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) -&gt; <span class="ident">CodegenResult</span><span class="op">&lt;</span><span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="comment">// Insert the function prototype into the `fn_protos` map to keep track for re-generating</span>
-        <span class="comment">// declarations in other modules.</span>
-        <span class="self">self</span>.<span class="ident">fn_protos</span>.<span class="ident">insert</span>(<span class="ident">proto</span>.<span class="number">0</span>.<span class="ident">clone</span>(), <span class="ident">proto</span>.<span class="ident">clone</span>());
+    <span class="kw">fn </span>codegen_function(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        FunctionAST(proto, body): <span class="kw-2">&amp;</span>FunctionAST,
+        named_values: <span class="kw-2">&amp;mut </span>HashMap&lt;String, Value&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt;,
+    ) -&gt; CodegenResult&lt;FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        <span class="comment">// Insert the function prototype into the `fn_protos` map to keep track for re-generating
+        // declarations in other modules.
+        </span><span class="self">self</span>.fn_protos.insert(proto.<span class="number">0</span>.clone(), proto.clone());
 
-        <span class="kw">let</span> <span class="ident">the_function</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">get_function</span>(<span class="kw-2">&amp;</span><span class="ident">proto</span>.<span class="number">0</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;If proto not already generated, get_function will do for us since we updated fn_protos before-hand!&quot;</span>);
+        <span class="kw">let </span>the_function = <span class="self">self</span>.get_function(<span class="kw-2">&amp;</span>proto.<span class="number">0</span>)
+            .expect(<span class="string">&quot;If proto not already generated, get_function will do for us since we updated fn_protos before-hand!&quot;</span>);
 
-        <span class="kw">if</span> <span class="ident">the_function</span>.<span class="ident">basic_blocks</span>() <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Function cannot be redefined.&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">if </span>the_function.basic_blocks() &gt; <span class="number">0 </span>{
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Function cannot be redefined.&quot;</span>.into());
         }
 
-        <span class="comment">// Create entry basic block to insert code.</span>
-        <span class="kw">let</span> <span class="ident">bb</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">append_basic_block</span>(<span class="ident">the_function</span>);
-        <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">pos_at_end</span>(<span class="ident">bb</span>);
+        <span class="comment">// Create entry basic block to insert code.
+        </span><span class="kw">let </span>bb = <span class="self">self</span>.module.append_basic_block(the_function);
+        <span class="self">self</span>.builder.pos_at_end(bb);
 
-        <span class="comment">// New scope, clear the map with the function args.</span>
-        <span class="ident">named_values</span>.<span class="ident">clear</span>();
+        <span class="comment">// New scope, clear the map with the function args.
+        </span>named_values.clear();
 
-        <span class="comment">// Update the map with the current functions args.</span>
-        <span class="kw">for</span> <span class="ident">idx</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">the_function</span>.<span class="ident">args</span>() {
-            <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="ident">the_function</span>.<span class="ident">arg</span>(<span class="ident">idx</span>);
-            <span class="ident">named_values</span>.<span class="ident">insert</span>(<span class="ident">arg</span>.<span class="ident">get_name</span>().<span class="ident">into</span>(), <span class="ident">arg</span>);
+        <span class="comment">// Update the map with the current functions args.
+        </span><span class="kw">for </span>idx <span class="kw">in </span><span class="number">0</span>..the_function.args() {
+            <span class="kw">let </span>arg = the_function.arg(idx);
+            named_values.insert(arg.get_name().into(), arg);
         }
 
-        <span class="comment">// Codegen function body.</span>
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">ret</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">codegen_expr</span>(<span class="ident">body</span>, <span class="ident">named_values</span>) {
-            <span class="self">self</span>.<span class="ident">builder</span>.<span class="ident">ret</span>(<span class="ident">ret</span>);
-            <span class="macro">assert!</span>(<span class="ident">the_function</span>.<span class="ident">verify</span>());
+        <span class="comment">// Codegen function body.
+        </span><span class="kw">if let </span><span class="prelude-val">Ok</span>(ret) = <span class="self">self</span>.codegen_expr(body, named_values) {
+            <span class="self">self</span>.builder.ret(ret);
+            <span class="macro">assert!</span>(the_function.verify());
 
-            <span class="comment">// Run the optimization passes on the function.</span>
-            <span class="self">self</span>.<span class="ident">fpm</span>.<span class="ident">run</span>(<span class="ident">the_function</span>);
+            <span class="comment">// Run the optimization passes on the function.
+            </span><span class="self">self</span>.fpm.run(the_function);
 
-            <span class="prelude-val">Ok</span>(<span class="ident">the_function</span>)
-        } <span class="kw">else</span> {
+            <span class="prelude-val">Ok</span>(the_function)
+        } <span class="kw">else </span>{
             <span class="macro">todo!</span>(<span class="string">&quot;Failed to codegen function body, erase from module!&quot;</span>);
         }
     }
 
-    <span class="doccomment">/// Lookup function with `name` in the LLVM module and return the corresponding value reference.</span>
-    <span class="doccomment">/// If the function is not available in the module, check if the prototype is known and codegen</span>
-    <span class="doccomment">/// it.</span>
-    <span class="doccomment">/// Return [`None`] if the prototype is not known.</span>
-    <span class="kw">fn</span> <span class="ident">get_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">callee</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">module</span>.<span class="ident">get_fn</span>(<span class="ident">name</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">callee</span>) =&gt; <span class="ident">callee</span>,
-            <span class="prelude-val">None</span> =&gt; {
-                <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fn_protos</span>.<span class="ident">get</span>(<span class="ident">name</span>)<span class="question-mark">?</span>;
-                <span class="self">self</span>.<span class="ident">codegen_prototype</span>(<span class="ident">proto</span>)
+    <span class="doccomment">/// Lookup function with `name` in the LLVM module and return the corresponding value reference.
+    /// If the function is not available in the module, check if the prototype is known and codegen
+    /// it.
+    /// Return [`None`] if the prototype is not known.
+    </span><span class="kw">fn </span>get_function(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        <span class="kw">let </span>callee = <span class="kw">match </span><span class="self">self</span>.module.get_fn(name) {
+            <span class="prelude-val">Some</span>(callee) =&gt; callee,
+            <span class="prelude-val">None </span>=&gt; {
+                <span class="kw">let </span>proto = <span class="self">self</span>.fn_protos.get(name)<span class="question-mark">?</span>;
+                <span class="self">self</span>.codegen_prototype(proto)
             }
         };
 
-        <span class="prelude-val">Some</span>(<span class="ident">callee</span>)
+        <span class="prelude-val">Some</span>(callee)
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

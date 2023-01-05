@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/parser.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>parser.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../normalize.css"><link rel="stylesheet" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../ayu.css" disabled><link rel="stylesheet" href="../../dark.css" disabled><link rel="stylesheet" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script><script defer src="../../main.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -658,660 +652,659 @@
 <span id="652">652</span>
 <span id="653">653</span>
 <span id="654">654</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lexer</span>::{<span class="ident">Lexer</span>, <span class="ident">Token</span>};
+</pre><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::lexer::{Lexer, Token};
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ExprAST</span> {
-    <span class="doccomment">/// Number - Expression class for numeric literals like &quot;1.0&quot;.</span>
-    <span class="ident">Number</span>(<span class="ident">f64</span>),
+<span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub enum </span>ExprAST {
+    <span class="doccomment">/// Number - Expression class for numeric literals like &quot;1.0&quot;.
+    </span>Number(f64),
 
-    <span class="doccomment">/// Variable - Expression class for referencing a variable, like &quot;a&quot;.</span>
-    <span class="ident">Variable</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// Variable - Expression class for referencing a variable, like &quot;a&quot;.
+    </span>Variable(String),
 
-    <span class="doccomment">/// Binary - Expression class for a binary operator.</span>
-    <span class="ident">Binary</span>(<span class="ident">char</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>, <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Binary - Expression class for a binary operator.
+    </span>Binary(char, Box&lt;ExprAST&gt;, Box&lt;ExprAST&gt;),
 
-    <span class="doccomment">/// Call - Expression class for function calls.</span>
-    <span class="ident">Call</span>(<span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Call - Expression class for function calls.
+    </span>Call(String, Vec&lt;ExprAST&gt;),
 
-    <span class="doccomment">/// If - Expression class for if/then/else.</span>
-    <span class="ident">If</span> {
-        <span class="ident">cond</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
-        <span class="ident">then</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
-        <span class="ident">else_</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// If - Expression class for if/then/else.
+    </span>If {
+        cond: Box&lt;ExprAST&gt;,
+        then: Box&lt;ExprAST&gt;,
+        else_: Box&lt;ExprAST&gt;,
     },
 
-    <span class="doccomment">/// ForExprAST - Expression class for for/in.</span>
-    <span class="ident">For</span> {
-        <span class="ident">var</span>: <span class="ident">String</span>,
-        <span class="ident">start</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
-        <span class="ident">end</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
-        <span class="ident">step</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-        <span class="ident">body</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// ForExprAST - Expression class for for/in.
+    </span>For {
+        var: String,
+        start: Box&lt;ExprAST&gt;,
+        end: Box&lt;ExprAST&gt;,
+        step: <span class="prelude-ty">Option</span>&lt;Box&lt;ExprAST&gt;&gt;,
+        body: Box&lt;ExprAST&gt;,
     },
 }
 
-<span class="doccomment">/// PrototypeAST - This class represents the &quot;prototype&quot; for a function,</span>
-<span class="doccomment">/// which captures its name, and its argument names (thus implicitly the number</span>
-<span class="doccomment">/// of arguments the function takes).</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Clone</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PrototypeAST</span>(<span class="kw">pub</span> <span class="ident">String</span>, <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>);
+<span class="doccomment">/// PrototypeAST - This class represents the &quot;prototype&quot; for a function,
+/// which captures its name, and its argument names (thus implicitly the number
+/// of arguments the function takes).
+</span><span class="attribute">#[derive(Debug, PartialEq, Clone)]
+</span><span class="kw">pub struct </span>PrototypeAST(<span class="kw">pub </span>String, <span class="kw">pub </span>Vec&lt;String&gt;);
 
-<span class="doccomment">/// FunctionAST - This class represents a function definition itself.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FunctionAST</span>(<span class="kw">pub</span> <span class="ident">PrototypeAST</span>, <span class="kw">pub</span> <span class="ident">ExprAST</span>);
+<span class="doccomment">/// FunctionAST - This class represents a function definition itself.
+</span><span class="attribute">#[derive(Debug, PartialEq)]
+</span><span class="kw">pub struct </span>FunctionAST(<span class="kw">pub </span>PrototypeAST, <span class="kw">pub </span>ExprAST);
 
-<span class="doccomment">/// Parse result with String as Error type (to be compliant with tutorial).</span>
-<span class="kw">type</span> <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">String</span><span class="op">&gt;</span>;
+<span class="doccomment">/// Parse result with String as Error type (to be compliant with tutorial).
+</span><span class="kw">type </span>ParseResult&lt;T&gt; = <span class="prelude-ty">Result</span>&lt;T, String&gt;;
 
-<span class="doccomment">/// Parser for the `kaleidoscope` language.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
+<span class="doccomment">/// Parser for the `kaleidoscope` language.
+</span><span class="kw">pub struct </span>Parser&lt;I&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = char&gt;,
 {
-    <span class="ident">lexer</span>: <span class="ident">Lexer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>,
-    <span class="ident">cur_tok</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Token</span><span class="op">&gt;</span>,
+    lexer: Lexer&lt;I&gt;,
+    cur_tok: <span class="prelude-ty">Option</span>&lt;Token&gt;,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span> <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>
-<span class="kw">where</span>
-    <span class="ident">I</span>: <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">char</span><span class="op">&gt;</span>,
+<span class="kw">impl</span>&lt;I&gt; Parser&lt;I&gt;
+<span class="kw">where
+    </span>I: Iterator&lt;Item = char&gt;,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">lexer</span>: <span class="ident">Lexer</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
-        <span class="ident">Parser</span> {
-            <span class="ident">lexer</span>,
-            <span class="ident">cur_tok</span>: <span class="prelude-val">None</span>,
+    <span class="kw">pub fn </span>new(lexer: Lexer&lt;I&gt;) -&gt; <span class="self">Self </span>{
+        Parser {
+            lexer,
+            cur_tok: <span class="prelude-val">None</span>,
         }
     }
 
-    <span class="comment">// -----------------------</span>
-    <span class="comment">//   Simple Token Buffer</span>
-    <span class="comment">// -----------------------</span>
+    <span class="comment">// -----------------------
+    //   Simple Token Buffer
+    // -----------------------
 
-    <span class="doccomment">/// Implement the global variable `int CurTok;` from the tutorial.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">/// Panics if the parser doesn&#39;t have a current token.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cur_tok</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Token</span> {
-        <span class="self">self</span>.<span class="ident">cur_tok</span>.<span class="ident">as_ref</span>().<span class="ident">expect</span>(<span class="string">&quot;Parser: Expected cur_token!&quot;</span>)
+    </span><span class="doccomment">/// Implement the global variable `int CurTok;` from the tutorial.
+    ///
+    /// # Panics
+    /// Panics if the parser doesn&#39;t have a current token.
+    </span><span class="kw">pub fn </span>cur_tok(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>Token {
+        <span class="self">self</span>.cur_tok.as_ref().expect(<span class="string">&quot;Parser: Expected cur_token!&quot;</span>)
     }
 
-    <span class="doccomment">/// Advance the `cur_tok` by getting the next token from the lexer.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement the fucntion `int getNextToken();` from the tutorial.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_next_token</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">cur_tok</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">lexer</span>.<span class="ident">gettok</span>());
+    <span class="doccomment">/// Advance the `cur_tok` by getting the next token from the lexer.
+    ///
+    /// Implement the fucntion `int getNextToken();` from the tutorial.
+    </span><span class="kw">pub fn </span>get_next_token(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="self">self</span>.cur_tok = <span class="prelude-val">Some</span>(<span class="self">self</span>.lexer.gettok());
     }
 
-    <span class="comment">// ----------------------------</span>
-    <span class="comment">//   Basic Expression Parsing</span>
-    <span class="comment">// ----------------------------</span>
+    <span class="comment">// ----------------------------
+    //   Basic Expression Parsing
+    // ----------------------------
 
-    <span class="doccomment">/// numberexpr ::= number</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseNumberExpr();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_num_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() {
-            <span class="ident">Token::Number</span>(<span class="ident">num</span>) =&gt; {
-                <span class="comment">// Consume the number token.</span>
-                <span class="self">self</span>.<span class="ident">get_next_token</span>();
-                <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Number</span>(<span class="ident">num</span>))
+    </span><span class="doccomment">/// numberexpr ::= number
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseNumberExpr();` from the tutorial.
+    </span><span class="kw">fn </span>parse_num_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() {
+            Token::Number(num) =&gt; {
+                <span class="comment">// Consume the number token.
+                </span><span class="self">self</span>.get_next_token();
+                <span class="prelude-val">Ok</span>(ExprAST::Number(num))
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         }
     }
 
-    <span class="doccomment">/// parenexpr ::= &#39;(&#39; expression &#39;)&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseParenExpr();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_paren_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="comment">// Eat &#39;(&#39; token.</span>
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::Char</span>(<span class="string">&#39;(&#39;</span>));
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+    <span class="doccomment">/// parenexpr ::= &#39;(&#39; expression &#39;)&#39;
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseParenExpr();` from the tutorial.
+    </span><span class="kw">fn </span>parse_paren_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="comment">// Eat &#39;(&#39; token.
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::Char(<span class="string">&#39;(&#39;</span>));
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>v = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">==</span> <span class="ident">Token::Char</span>(<span class="string">&#39;)&#39;</span>) {
-            <span class="comment">// Eat &#39;)&#39; token.</span>
-            <span class="self">self</span>.<span class="ident">get_next_token</span>();
-            <span class="prelude-val">Ok</span>(<span class="ident">v</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;)&#39;&quot;</span>.<span class="ident">into</span>())
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() == Token::Char(<span class="string">&#39;)&#39;</span>) {
+            <span class="comment">// Eat &#39;)&#39; token.
+            </span><span class="self">self</span>.get_next_token();
+            <span class="prelude-val">Ok</span>(v)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;)&#39;&quot;</span>.into())
         }
     }
 
-    <span class="doccomment">/// identifierexpr</span>
-    <span class="doccomment">///   ::= identifier</span>
-    <span class="doccomment">///   ::= identifier &#39;(&#39; expression* &#39;)&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseIdentifierExpr();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_identifier_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cur_tok</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Token::Identifier</span>(<span class="ident">id</span>)) =&gt; {
-                <span class="comment">// Consume identifier.</span>
-                <span class="self">self</span>.<span class="ident">get_next_token</span>();
-                <span class="ident">id</span>
+    <span class="doccomment">/// identifierexpr
+    ///   ::= identifier
+    ///   ::= identifier &#39;(&#39; expression* &#39;)&#39;
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseIdentifierExpr();` from the tutorial.
+    </span><span class="kw">fn </span>parse_identifier_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="kw">let </span>id_name = <span class="kw">match </span><span class="self">self</span>.cur_tok.take() {
+            <span class="prelude-val">Some</span>(Token::Identifier(id)) =&gt; {
+                <span class="comment">// Consume identifier.
+                </span><span class="self">self</span>.get_next_token();
+                id
             }
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;(&#39;</span>) {
-            <span class="comment">// Simple variable reference.</span>
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Variable</span>(<span class="ident">id_name</span>))
-        } <span class="kw">else</span> {
-            <span class="comment">// Call.</span>
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;(&#39;</span>) {
+            <span class="comment">// Simple variable reference.
+            </span><span class="prelude-val">Ok</span>(ExprAST::Variable(id_name))
+        } <span class="kw">else </span>{
+            <span class="comment">// Call.
 
-            <span class="comment">// Eat &#39;(&#39; token.</span>
-            <span class="self">self</span>.<span class="ident">get_next_token</span>();
+            // Eat &#39;(&#39; token.
+            </span><span class="self">self</span>.get_next_token();
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
+            <span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;ExprAST&gt; = Vec::new();
 
-            <span class="comment">// If there are arguments collect them.</span>
-            <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;)&#39;</span>) {
-                <span class="kw">loop</span> {
-                    <span class="kw">let</span> <span class="ident">arg</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
-                    <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">arg</span>);
+            <span class="comment">// If there are arguments collect them.
+            </span><span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;)&#39;</span>) {
+                <span class="kw">loop </span>{
+                    <span class="kw">let </span>arg = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
+                    args.push(arg);
 
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">==</span> <span class="ident">Token::Char</span>(<span class="string">&#39;)&#39;</span>) {
+                    <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() == Token::Char(<span class="string">&#39;)&#39;</span>) {
                         <span class="kw">break</span>;
                     }
 
-                    <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;,&#39;</span>) {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;)&#39; or &#39;,&#39; in argument list&quot;</span>.<span class="ident">into</span>());
+                    <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;,&#39;</span>) {
+                        <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;)&#39; or &#39;,&#39; in argument list&quot;</span>.into());
                     }
 
-                    <span class="self">self</span>.<span class="ident">get_next_token</span>();
+                    <span class="self">self</span>.get_next_token();
                 }
             }
 
-            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::Char</span>(<span class="string">&#39;)&#39;</span>));
-            <span class="comment">// Eat &#39;)&#39; token.</span>
-            <span class="self">self</span>.<span class="ident">get_next_token</span>();
+            <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::Char(<span class="string">&#39;)&#39;</span>));
+            <span class="comment">// Eat &#39;)&#39; token.
+            </span><span class="self">self</span>.get_next_token();
 
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Call</span>(<span class="ident">id_name</span>, <span class="ident">args</span>))
+            <span class="prelude-val">Ok</span>(ExprAST::Call(id_name, args))
         }
     }
 
-    <span class="doccomment">/// ifexpr ::= &#39;if&#39; expression &#39;then&#39; expression &#39;else&#39; expression</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseIfExpr();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_if_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="comment">// Consume &#39;if&#39; token.</span>
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::If</span>);
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+    <span class="doccomment">/// ifexpr ::= &#39;if&#39; expression &#39;then&#39; expression &#39;else&#39; expression
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseIfExpr();` from the tutorial.
+    </span><span class="kw">fn </span>parse_if_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="comment">// Consume &#39;if&#39; token.
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::If);
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>cond = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="macro">dbg!</span>(<span class="self">self</span>.<span class="ident">cur_tok</span>()) <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Then</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;then&#39;&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">if </span><span class="kw-2">*</span><span class="macro">dbg!</span>(<span class="self">self</span>.cur_tok()) != Token::Then {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;then&#39;&quot;</span>.into());
         }
-        <span class="comment">// Consume &#39;then&#39; token.</span>
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="comment">// Consume &#39;then&#39; token.
+        </span><span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">then</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>then = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Else</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;else&#39;&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Else {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;else&#39;&quot;</span>.into());
         }
-        <span class="comment">// Consume &#39;else&#39; token.</span>
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="comment">// Consume &#39;else&#39; token.
+        </span><span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">else_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>else_ = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::If</span> {
-            <span class="ident">cond</span>: <span class="ident">Box::new</span>(<span class="ident">cond</span>),
-            <span class="ident">then</span>: <span class="ident">Box::new</span>(<span class="ident">then</span>),
-            <span class="ident">else_</span>: <span class="ident">Box::new</span>(<span class="ident">else_</span>),
+        <span class="prelude-val">Ok</span>(ExprAST::If {
+            cond: Box::new(cond),
+            then: Box::new(then),
+            else_: Box::new(else_),
         })
     }
 
-    <span class="doccomment">/// forexpr ::= &#39;for&#39; identifier &#39;=&#39; expr &#39;,&#39; expr (&#39;,&#39; expr)? &#39;in&#39; expression</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseForExpr();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_for_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="comment">// Consume the &#39;for&#39; token.</span>
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::For</span>);
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+    <span class="doccomment">/// forexpr ::= &#39;for&#39; identifier &#39;=&#39; expr &#39;,&#39; expr (&#39;,&#39; expr)? &#39;in&#39; expression
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseForExpr();` from the tutorial.
+    </span><span class="kw">fn </span>parse_for_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="comment">// Consume the &#39;for&#39; token.
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::For);
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>
-            .<span class="ident">parse_identifier_expr</span>()
-            .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">String::from</span>(<span class="string">&quot;expected identifier after &#39;for&#39;&quot;</span>))<span class="question-mark">?</span>
-        {
-            <span class="ident">ExprAST::Variable</span>(<span class="ident">var</span>) =&gt; <span class="ident">var</span>,
-            <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+        <span class="kw">let </span>var = <span class="kw">match </span><span class="self">self
+            </span>.parse_identifier_expr()
+            .map_err(|<span class="kw">_</span>| String::from(<span class="string">&quot;expected identifier after &#39;for&#39;&quot;</span>))<span class="question-mark">?
+        </span>{
+            ExprAST::Variable(var) =&gt; var,
+            <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
         };
 
-        <span class="comment">// Consume the &#39;=&#39; token.</span>
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;=&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;=&#39; after for&quot;</span>.<span class="ident">into</span>());
+        <span class="comment">// Consume the &#39;=&#39; token.
+        </span><span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;=&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;=&#39; after for&quot;</span>.into());
         }
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>start = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="comment">// Consume the &#39;,&#39; token.</span>
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;,&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;,&#39; after for start value&quot;</span>.<span class="ident">into</span>());
+        <span class="comment">// Consume the &#39;,&#39; token.
+        </span><span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;,&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;,&#39; after for start value&quot;</span>.into());
         }
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>end = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">==</span> <span class="ident">Token::Char</span>(<span class="string">&#39;,&#39;</span>) {
-            <span class="comment">// Consume the &#39;,&#39; token.</span>
-            <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="kw">let </span>step = <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() == Token::Char(<span class="string">&#39;,&#39;</span>) {
+            <span class="comment">// Consume the &#39;,&#39; token.
+            </span><span class="self">self</span>.get_next_token();
 
-            <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>)
-        } <span class="kw">else</span> {
-            <span class="prelude-val">None</span>
-        };
+            <span class="prelude-val">Some</span>(<span class="self">self</span>.parse_expression()<span class="question-mark">?</span>)
+        } <span class="kw">else </span>{
+            <span class="prelude-val">None
+        </span>};
 
-        <span class="comment">// Consume the &#39;in&#39; token.</span>
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::In</span> {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;in&#39; after for&quot;</span>.<span class="ident">into</span>());
+        <span class="comment">// Consume the &#39;in&#39; token.
+        </span><span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::In {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;expected &#39;in&#39; after for&quot;</span>.into());
         }
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>body = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::For</span> {
-            <span class="ident">var</span>,
-            <span class="ident">start</span>: <span class="ident">Box::new</span>(<span class="ident">start</span>),
-            <span class="ident">end</span>: <span class="ident">Box::new</span>(<span class="ident">end</span>),
-            <span class="ident">step</span>: <span class="ident">step</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">s</span><span class="op">|</span> <span class="ident">Box::new</span>(<span class="ident">s</span>)),
-            <span class="ident">body</span>: <span class="ident">Box::new</span>(<span class="ident">body</span>),
+        <span class="prelude-val">Ok</span>(ExprAST::For {
+            var,
+            start: Box::new(start),
+            end: Box::new(end),
+            step: step.map(|s| Box::new(s)),
+            body: Box::new(body),
         })
     }
 
-    <span class="doccomment">/// primary</span>
-    <span class="doccomment">///   ::= identifierexpr</span>
-    <span class="doccomment">///   ::= numberexpr</span>
-    <span class="doccomment">///   ::= parenexpr</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParsePrimary();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_primary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() {
-            <span class="ident">Token::Identifier</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_identifier_expr</span>(),
-            <span class="ident">Token::Number</span>(<span class="kw">_</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_num_expr</span>(),
-            <span class="ident">Token::Char</span>(<span class="string">&#39;(&#39;</span>) =&gt; <span class="self">self</span>.<span class="ident">parse_paren_expr</span>(),
-            <span class="ident">Token::If</span> =&gt; <span class="self">self</span>.<span class="ident">parse_if_expr</span>(),
-            <span class="ident">Token::For</span> =&gt; <span class="self">self</span>.<span class="ident">parse_for_expr</span>(),
-            <span class="kw">_</span> =&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown token when expecting an expression&quot;</span>.<span class="ident">into</span>()),
+    <span class="doccomment">/// primary
+    ///   ::= identifierexpr
+    ///   ::= numberexpr
+    ///   ::= parenexpr
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParsePrimary();` from the tutorial.
+    </span><span class="kw">fn </span>parse_primary(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="kw">match </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() {
+            Token::Identifier(<span class="kw">_</span>) =&gt; <span class="self">self</span>.parse_identifier_expr(),
+            Token::Number(<span class="kw">_</span>) =&gt; <span class="self">self</span>.parse_num_expr(),
+            Token::Char(<span class="string">&#39;(&#39;</span>) =&gt; <span class="self">self</span>.parse_paren_expr(),
+            Token::If =&gt; <span class="self">self</span>.parse_if_expr(),
+            Token::For =&gt; <span class="self">self</span>.parse_for_expr(),
+            <span class="kw">_ </span>=&gt; <span class="prelude-val">Err</span>(<span class="string">&quot;unknown token when expecting an expression&quot;</span>.into()),
         }
     }
 
-    <span class="comment">// -----------------------------</span>
-    <span class="comment">//   Binary Expression Parsing</span>
-    <span class="comment">// -----------------------------</span>
+    <span class="comment">// -----------------------------
+    //   Binary Expression Parsing
+    // -----------------------------
 
-    <span class="doccomment">/// /// expression</span>
-    <span class="doccomment">///   ::= primary binoprhs</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseExpression();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_expression</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">lhs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_primary</span>()<span class="question-mark">?</span>;
-        <span class="self">self</span>.<span class="ident">parse_bin_op_rhs</span>(<span class="number">0</span>, <span class="ident">lhs</span>)
+    </span><span class="doccomment">/// /// expression
+    ///   ::= primary binoprhs
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseExpression();` from the tutorial.
+    </span><span class="kw">fn </span>parse_expression(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="kw">let </span>lhs = <span class="self">self</span>.parse_primary()<span class="question-mark">?</span>;
+        <span class="self">self</span>.parse_bin_op_rhs(<span class="number">0</span>, lhs)
     }
 
-    <span class="doccomment">/// binoprhs</span>
-    <span class="doccomment">///   ::= (&#39;+&#39; primary)*</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;ExprAST&gt; ParseBinOpRHS(int ExprPrec, std::unique_ptr&lt;ExprAST&gt; LHS);` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_bin_op_rhs</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">expr_prec</span>: <span class="ident">isize</span>, <span class="kw-2">mut</span> <span class="ident">lhs</span>: <span class="ident">ExprAST</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">ExprAST</span><span class="op">&gt;</span> {
-        <span class="kw">loop</span> {
-            <span class="kw">let</span> <span class="ident">tok_prec</span> <span class="op">=</span> <span class="ident">get_tok_precedence</span>(<span class="self">self</span>.<span class="ident">cur_tok</span>());
+    <span class="doccomment">/// binoprhs
+    ///   ::= (&#39;+&#39; primary)*
+    ///
+    /// Implement `std::unique_ptr&lt;ExprAST&gt; ParseBinOpRHS(int ExprPrec, std::unique_ptr&lt;ExprAST&gt; LHS);` from the tutorial.
+    </span><span class="kw">fn </span>parse_bin_op_rhs(<span class="kw-2">&amp;mut </span><span class="self">self</span>, expr_prec: isize, <span class="kw-2">mut </span>lhs: ExprAST) -&gt; ParseResult&lt;ExprAST&gt; {
+        <span class="kw">loop </span>{
+            <span class="kw">let </span>tok_prec = get_tok_precedence(<span class="self">self</span>.cur_tok());
 
-            <span class="comment">// Not a binary operator or precedence is too small.</span>
-            <span class="kw">if</span> <span class="ident">tok_prec</span> <span class="op">&lt;</span> <span class="ident">expr_prec</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">lhs</span>);
+            <span class="comment">// Not a binary operator or precedence is too small.
+            </span><span class="kw">if </span>tok_prec &lt; expr_prec {
+                <span class="kw">return </span><span class="prelude-val">Ok</span>(lhs);
             }
 
-            <span class="kw">let</span> <span class="ident">binop</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cur_tok</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">Token::Char</span>(<span class="ident">c</span>)) =&gt; {
-                    <span class="comment">// Eat binary operator.</span>
-                    <span class="self">self</span>.<span class="ident">get_next_token</span>();
-                    <span class="ident">c</span>
+            <span class="kw">let </span>binop = <span class="kw">match </span><span class="self">self</span>.cur_tok.take() {
+                <span class="prelude-val">Some</span>(Token::Char(c)) =&gt; {
+                    <span class="comment">// Eat binary operator.
+                    </span><span class="self">self</span>.get_next_token();
+                    c
                 }
-                <span class="kw">_</span> =&gt; <span class="macro">unreachable!</span>(),
+                <span class="kw">_ </span>=&gt; <span class="macro">unreachable!</span>(),
             };
 
-            <span class="comment">// lhs BINOP1 rhs BINOP2 remrhs</span>
-            <span class="comment">//     ^^^^^^     ^^^^^^</span>
-            <span class="comment">//     tok_prec   next_prec</span>
-            <span class="comment">//</span>
-            <span class="comment">// In case BINOP1 has higher precedence, we are done here and can build a &#39;Binary&#39; AST</span>
-            <span class="comment">// node between &#39;lhs&#39; and &#39;rhs&#39;.</span>
-            <span class="comment">//</span>
-            <span class="comment">// In case BINOP2 has higher precedence, we take &#39;rhs&#39; as &#39;lhs&#39; and recurse into the</span>
-            <span class="comment">// &#39;remrhs&#39; expression first.</span>
+            <span class="comment">// lhs BINOP1 rhs BINOP2 remrhs
+            //     ^^^^^^     ^^^^^^
+            //     tok_prec   next_prec
+            //
+            // In case BINOP1 has higher precedence, we are done here and can build a &#39;Binary&#39; AST
+            // node between &#39;lhs&#39; and &#39;rhs&#39;.
+            //
+            // In case BINOP2 has higher precedence, we take &#39;rhs&#39; as &#39;lhs&#39; and recurse into the
+            // &#39;remrhs&#39; expression first.
 
-            <span class="comment">// Parse primary expression after binary operator.</span>
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">rhs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_primary</span>()<span class="question-mark">?</span>;
+            // Parse primary expression after binary operator.
+            </span><span class="kw">let </span><span class="kw-2">mut </span>rhs = <span class="self">self</span>.parse_primary()<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="ident">next_prec</span> <span class="op">=</span> <span class="ident">get_tok_precedence</span>(<span class="self">self</span>.<span class="ident">cur_tok</span>());
-            <span class="kw">if</span> <span class="ident">tok_prec</span> <span class="op">&lt;</span> <span class="ident">next_prec</span> {
-                <span class="comment">// BINOP2 has higher precedence thatn BINOP1, recurse into &#39;remhs&#39;.</span>
-                <span class="ident">rhs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_bin_op_rhs</span>(<span class="ident">tok_prec</span> <span class="op">+</span> <span class="number">1</span>, <span class="ident">rhs</span>)<span class="question-mark">?</span>
-            }
+            <span class="kw">let </span>next_prec = get_tok_precedence(<span class="self">self</span>.cur_tok());
+            <span class="kw">if </span>tok_prec &lt; next_prec {
+                <span class="comment">// BINOP2 has higher precedence thatn BINOP1, recurse into &#39;remhs&#39;.
+                </span>rhs = <span class="self">self</span>.parse_bin_op_rhs(tok_prec + <span class="number">1</span>, rhs)<span class="question-mark">?
+            </span>}
 
-            <span class="ident">lhs</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(<span class="ident">binop</span>, <span class="ident">Box::new</span>(<span class="ident">lhs</span>), <span class="ident">Box::new</span>(<span class="ident">rhs</span>));
+            lhs = ExprAST::Binary(binop, Box::new(lhs), Box::new(rhs));
         }
     }
 
-    <span class="comment">// --------------------</span>
-    <span class="comment">//   Parsing the Rest</span>
-    <span class="comment">// --------------------</span>
+    <span class="comment">// --------------------
+    //   Parsing the Rest
+    // --------------------
 
-    <span class="doccomment">/// prototype</span>
-    <span class="doccomment">///   ::= id &#39;(&#39; id* &#39;)&#39;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;PrototypeAST&gt; ParsePrototype();` from the tutorial.</span>
-    <span class="kw">fn</span> <span class="ident">parse_prototype</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">PrototypeAST</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">id_name</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cur_tok</span>.<span class="ident">take</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">Token::Identifier</span>(<span class="ident">id</span>)) =&gt; {
-                <span class="comment">// Consume the identifier.</span>
-                <span class="self">self</span>.<span class="ident">get_next_token</span>();
-                <span class="ident">id</span>
+    </span><span class="doccomment">/// prototype
+    ///   ::= id &#39;(&#39; id* &#39;)&#39;
+    ///
+    /// Implement `std::unique_ptr&lt;PrototypeAST&gt; ParsePrototype();` from the tutorial.
+    </span><span class="kw">fn </span>parse_prototype(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;PrototypeAST&gt; {
+        <span class="kw">let </span>id_name = <span class="kw">match </span><span class="self">self</span>.cur_tok.take() {
+            <span class="prelude-val">Some</span>(Token::Identifier(id)) =&gt; {
+                <span class="comment">// Consume the identifier.
+                </span><span class="self">self</span>.get_next_token();
+                id
             }
-            <span class="ident">other</span> =&gt; {
-                <span class="comment">// Plug back current token.</span>
-                <span class="self">self</span>.<span class="ident">cur_tok</span> <span class="op">=</span> <span class="ident">other</span>;
-                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected function name in prototype&quot;</span>.<span class="ident">into</span>());
+            other =&gt; {
+                <span class="comment">// Plug back current token.
+                </span><span class="self">self</span>.cur_tok = other;
+                <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected function name in prototype&quot;</span>.into());
             }
         };
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;(&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;(&#39; in prototype&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;(&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;(&#39; in prototype&quot;</span>.into());
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
-        <span class="kw">loop</span> {
-            <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="kw">let </span><span class="kw-2">mut </span>args: Vec&lt;String&gt; = Vec::new();
+        <span class="kw">loop </span>{
+            <span class="self">self</span>.get_next_token();
 
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">cur_tok</span>.<span class="ident">take</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">Token::Identifier</span>(<span class="ident">arg</span>)) =&gt; <span class="ident">args</span>.<span class="ident">push</span>(<span class="ident">arg</span>),
-                <span class="prelude-val">Some</span>(<span class="ident">Token::Char</span>(<span class="string">&#39;,&#39;</span>)) =&gt; {}
-                <span class="ident">other</span> =&gt; {
-                    <span class="self">self</span>.<span class="ident">cur_tok</span> <span class="op">=</span> <span class="ident">other</span>;
+            <span class="kw">match </span><span class="self">self</span>.cur_tok.take() {
+                <span class="prelude-val">Some</span>(Token::Identifier(arg)) =&gt; args.push(arg),
+                <span class="prelude-val">Some</span>(Token::Char(<span class="string">&#39;,&#39;</span>)) =&gt; {}
+                other =&gt; {
+                    <span class="self">self</span>.cur_tok = other;
                     <span class="kw">break</span>;
                 }
             }
         }
 
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>() <span class="op">!</span><span class="op">=</span> <span class="ident">Token::Char</span>(<span class="string">&#39;)&#39;</span>) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;)&#39; in prototype&quot;</span>.<span class="ident">into</span>());
+        <span class="kw">if </span><span class="kw-2">*</span><span class="self">self</span>.cur_tok() != Token::Char(<span class="string">&#39;)&#39;</span>) {
+            <span class="kw">return </span><span class="prelude-val">Err</span>(<span class="string">&quot;Expected &#39;)&#39; in prototype&quot;</span>.into());
         }
 
-        <span class="comment">// Consume &#39;)&#39;.</span>
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+        <span class="comment">// Consume &#39;)&#39;.
+        </span><span class="self">self</span>.get_next_token();
 
-        <span class="prelude-val">Ok</span>(<span class="ident">PrototypeAST</span>(<span class="ident">id_name</span>, <span class="ident">args</span>))
+        <span class="prelude-val">Ok</span>(PrototypeAST(id_name, args))
     }
 
-    <span class="doccomment">/// definition ::= &#39;def&#39; prototype expression</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;FunctionAST&gt; ParseDefinition();` from the tutorial.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_definition</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">FunctionAST</span><span class="op">&gt;</span> {
-        <span class="comment">// Consume &#39;def&#39; token.</span>
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::Def</span>);
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+    <span class="doccomment">/// definition ::= &#39;def&#39; prototype expression
+    ///
+    /// Implement `std::unique_ptr&lt;FunctionAST&gt; ParseDefinition();` from the tutorial.
+    </span><span class="kw">pub fn </span>parse_definition(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;FunctionAST&gt; {
+        <span class="comment">// Consume &#39;def&#39; token.
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::Def);
+        <span class="self">self</span>.get_next_token();
 
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_prototype</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">expr</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
+        <span class="kw">let </span>proto = <span class="self">self</span>.parse_prototype()<span class="question-mark">?</span>;
+        <span class="kw">let </span>expr = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">FunctionAST</span>(<span class="ident">proto</span>, <span class="ident">expr</span>))
+        <span class="prelude-val">Ok</span>(FunctionAST(proto, expr))
     }
 
-    <span class="doccomment">/// external ::= &#39;extern&#39; prototype</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;PrototypeAST&gt; ParseExtern();` from the tutorial.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_extern</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">PrototypeAST</span><span class="op">&gt;</span> {
-        <span class="comment">// Consume &#39;extern&#39; token.</span>
-        <span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">cur_tok</span>(), <span class="ident">Token::Extern</span>);
-        <span class="self">self</span>.<span class="ident">get_next_token</span>();
+    <span class="doccomment">/// external ::= &#39;extern&#39; prototype
+    ///
+    /// Implement `std::unique_ptr&lt;PrototypeAST&gt; ParseExtern();` from the tutorial.
+    </span><span class="kw">pub fn </span>parse_extern(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;PrototypeAST&gt; {
+        <span class="comment">// Consume &#39;extern&#39; token.
+        </span><span class="macro">assert_eq!</span>(<span class="kw-2">*</span><span class="self">self</span>.cur_tok(), Token::Extern);
+        <span class="self">self</span>.get_next_token();
 
-        <span class="self">self</span>.<span class="ident">parse_prototype</span>()
+        <span class="self">self</span>.parse_prototype()
     }
 
-    <span class="doccomment">/// toplevelexpr ::= expression</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Implement `std::unique_ptr&lt;FunctionAST&gt; ParseTopLevelExpr();` from the tutorial.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse_top_level_expr</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="ident">ParseResult</span><span class="op">&lt;</span><span class="ident">FunctionAST</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">e</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">parse_expression</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="ident">PrototypeAST</span>(<span class="string">&quot;__anon_expr&quot;</span>.<span class="ident">into</span>(), <span class="ident">Vec::new</span>());
-        <span class="prelude-val">Ok</span>(<span class="ident">FunctionAST</span>(<span class="ident">proto</span>, <span class="ident">e</span>))
-    }
-}
-
-<span class="doccomment">/// Get the binary operator precedence.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// Implement `int GetTokPrecedence();` from the tutorial.</span>
-<span class="kw">fn</span> <span class="ident">get_tok_precedence</span>(<span class="ident">tok</span>: <span class="kw-2">&amp;</span><span class="ident">Token</span>) -&gt; <span class="ident">isize</span> {
-    <span class="kw">match</span> <span class="ident">tok</span> {
-        <span class="ident">Token::Char</span>(<span class="string">&#39;&lt;&#39;</span>) =&gt; <span class="number">10</span>,
-        <span class="ident">Token::Char</span>(<span class="string">&#39;+&#39;</span>) =&gt; <span class="number">20</span>,
-        <span class="ident">Token::Char</span>(<span class="string">&#39;-&#39;</span>) =&gt; <span class="number">20</span>,
-        <span class="ident">Token::Char</span>(<span class="string">&#39;*&#39;</span>) =&gt; <span class="number">40</span>,
-        <span class="kw">_</span> =&gt; <span class="op">-</span><span class="number">1</span>,
+    <span class="doccomment">/// toplevelexpr ::= expression
+    ///
+    /// Implement `std::unique_ptr&lt;FunctionAST&gt; ParseTopLevelExpr();` from the tutorial.
+    </span><span class="kw">pub fn </span>parse_top_level_expr(<span class="kw-2">&amp;mut </span><span class="self">self</span>) -&gt; ParseResult&lt;FunctionAST&gt; {
+        <span class="kw">let </span>e = <span class="self">self</span>.parse_expression()<span class="question-mark">?</span>;
+        <span class="kw">let </span>proto = PrototypeAST(<span class="string">&quot;__anon_expr&quot;</span>.into(), Vec::new());
+        <span class="prelude-val">Ok</span>(FunctionAST(proto, e))
     }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
-<span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ExprAST</span>, <span class="ident">FunctionAST</span>, <span class="ident">Parser</span>, <span class="ident">PrototypeAST</span>};
-    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::lexer::Lexer</span>;
+<span class="doccomment">/// Get the binary operator precedence.
+///
+/// Implement `int GetTokPrecedence();` from the tutorial.
+</span><span class="kw">fn </span>get_tok_precedence(tok: <span class="kw-2">&amp;</span>Token) -&gt; isize {
+    <span class="kw">match </span>tok {
+        Token::Char(<span class="string">&#39;&lt;&#39;</span>) =&gt; <span class="number">10</span>,
+        Token::Char(<span class="string">&#39;+&#39;</span>) =&gt; <span class="number">20</span>,
+        Token::Char(<span class="string">&#39;-&#39;</span>) =&gt; <span class="number">20</span>,
+        Token::Char(<span class="string">&#39;*&#39;</span>) =&gt; <span class="number">40</span>,
+        <span class="kw">_ </span>=&gt; -<span class="number">1</span>,
+    }
+}
 
-    <span class="kw">fn</span> <span class="ident">parser</span>(<span class="ident">input</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="ident">Parser</span><span class="op">&lt;</span><span class="ident">std::str::Chars</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">l</span> <span class="op">=</span> <span class="ident">Lexer::new</span>(<span class="ident">input</span>.<span class="ident">chars</span>());
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">Parser::new</span>(<span class="ident">l</span>);
+<span class="attribute">#[cfg(test)]
+</span><span class="kw">mod </span>test {
+    <span class="kw">use super</span>::{ExprAST, FunctionAST, Parser, PrototypeAST};
+    <span class="kw">use </span><span class="kw">crate</span>::lexer::Lexer;
 
-        <span class="comment">// Drop initial coin, initialize cur_tok.</span>
-        <span class="ident">p</span>.<span class="ident">get_next_token</span>();
+    <span class="kw">fn </span>parser(input: <span class="kw-2">&amp;</span>str) -&gt; Parser&lt;std::str::Chars&gt; {
+        <span class="kw">let </span>l = Lexer::new(input.chars());
+        <span class="kw">let </span><span class="kw-2">mut </span>p = Parser::new(l);
 
-        <span class="ident">p</span>
+        <span class="comment">// Drop initial coin, initialize cur_tok.
+        </span>p.get_next_token();
+
+        p
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_number</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;13.37&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_number() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;13.37&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_num_expr</span>(), <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Number</span>(<span class="number">13.37f64</span>)));
+        <span class="macro">assert_eq!</span>(p.parse_num_expr(), <span class="prelude-val">Ok</span>(ExprAST::Number(<span class="number">13.37f64</span>)));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_variable</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;foop&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_variable() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;foop&quot;</span>);
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_identifier_expr</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;foop&quot;</span>.<span class="ident">into</span>()))
+            p.parse_identifier_expr(),
+            <span class="prelude-val">Ok</span>(ExprAST::Variable(<span class="string">&quot;foop&quot;</span>.into()))
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_if</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;if 1 then 2 else 3&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_if() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;if 1 then 2 else 3&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">1f64</span>));
-        <span class="kw">let</span> <span class="ident">then</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">2f64</span>));
-        <span class="kw">let</span> <span class="ident">else_</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">3f64</span>));
+        <span class="kw">let </span>cond = Box::new(ExprAST::Number(<span class="number">1f64</span>));
+        <span class="kw">let </span>then = Box::new(ExprAST::Number(<span class="number">2f64</span>));
+        <span class="kw">let </span>else_ = Box::new(ExprAST::Number(<span class="number">3f64</span>));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_if_expr</span>(), <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::If</span> { <span class="ident">cond</span>, <span class="ident">then</span>, <span class="ident">else_</span> }));
+        <span class="macro">assert_eq!</span>(p.parse_if_expr(), <span class="prelude-val">Ok</span>(ExprAST::If { cond, then, else_ }));
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;if foo() then bar(2) else baz(3)&quot;</span>);
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;if foo() then bar(2) else baz(3)&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">cond</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Call</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[]));
-        <span class="kw">let</span> <span class="ident">then</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Call</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="ident">ExprAST::Number</span>(<span class="number">2f64</span>)]));
-        <span class="kw">let</span> <span class="ident">else_</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Call</span>(<span class="string">&quot;baz&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="ident">ExprAST::Number</span>(<span class="number">3f64</span>)]));
+        <span class="kw">let </span>cond = Box::new(ExprAST::Call(<span class="string">&quot;foo&quot;</span>.into(), <span class="macro">vec!</span>[]));
+        <span class="kw">let </span>then = Box::new(ExprAST::Call(<span class="string">&quot;bar&quot;</span>.into(), <span class="macro">vec!</span>[ExprAST::Number(<span class="number">2f64</span>)]));
+        <span class="kw">let </span>else_ = Box::new(ExprAST::Call(<span class="string">&quot;baz&quot;</span>.into(), <span class="macro">vec!</span>[ExprAST::Number(<span class="number">3f64</span>)]));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_if_expr</span>(), <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::If</span> { <span class="ident">cond</span>, <span class="ident">then</span>, <span class="ident">else_</span> }));
+        <span class="macro">assert_eq!</span>(p.parse_if_expr(), <span class="prelude-val">Ok</span>(ExprAST::If { cond, then, else_ }));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_for</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;for i = 1, 2, 3 in 4&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_for() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;for i = 1, 2, 3 in 4&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;i&quot;</span>);
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">1f64</span>));
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">2f64</span>));
-        <span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">3f64</span>)));
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">4f64</span>));
+        <span class="kw">let </span>var = String::from(<span class="string">&quot;i&quot;</span>);
+        <span class="kw">let </span>start = Box::new(ExprAST::Number(<span class="number">1f64</span>));
+        <span class="kw">let </span>end = Box::new(ExprAST::Number(<span class="number">2f64</span>));
+        <span class="kw">let </span>step = <span class="prelude-val">Some</span>(Box::new(ExprAST::Number(<span class="number">3f64</span>)));
+        <span class="kw">let </span>body = Box::new(ExprAST::Number(<span class="number">4f64</span>));
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_for_expr</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::For</span> {
-                <span class="ident">var</span>,
-                <span class="ident">start</span>,
-                <span class="ident">end</span>,
-                <span class="ident">step</span>,
-                <span class="ident">body</span>
+            p.parse_for_expr(),
+            <span class="prelude-val">Ok</span>(ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body
             })
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_for_no_step</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;for i = 1, 2 in 4&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_for_no_step() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;for i = 1, 2 in 4&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">var</span> <span class="op">=</span> <span class="ident">String::from</span>(<span class="string">&quot;i&quot;</span>);
-        <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">1f64</span>));
-        <span class="kw">let</span> <span class="ident">end</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">2f64</span>));
-        <span class="kw">let</span> <span class="ident">step</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">4f64</span>));
+        <span class="kw">let </span>var = String::from(<span class="string">&quot;i&quot;</span>);
+        <span class="kw">let </span>start = Box::new(ExprAST::Number(<span class="number">1f64</span>));
+        <span class="kw">let </span>end = Box::new(ExprAST::Number(<span class="number">2f64</span>));
+        <span class="kw">let </span>step = <span class="prelude-val">None</span>;
+        <span class="kw">let </span>body = Box::new(ExprAST::Number(<span class="number">4f64</span>));
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_for_expr</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::For</span> {
-                <span class="ident">var</span>,
-                <span class="ident">start</span>,
-                <span class="ident">end</span>,
-                <span class="ident">step</span>,
-                <span class="ident">body</span>
+            p.parse_for_expr(),
+            <span class="prelude-val">Ok</span>(ExprAST::For {
+                var,
+                start,
+                end,
+                step,
+                body
             })
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_primary</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;1337 foop \n bla(123) \n if a then b else c \n for x=1,2 in 3&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_primary() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;1337 foop \n bla(123) \n if a then b else c \n for x=1,2 in 3&quot;</span>);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_primary</span>(), <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Number</span>(<span class="number">1337f64</span>)));
+        <span class="macro">assert_eq!</span>(p.parse_primary(), <span class="prelude-val">Ok</span>(ExprAST::Number(<span class="number">1337f64</span>)));
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_primary</span>(), <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;foop&quot;</span>.<span class="ident">into</span>())));
+        <span class="macro">assert_eq!</span>(p.parse_primary(), <span class="prelude-val">Ok</span>(ExprAST::Variable(<span class="string">&quot;foop&quot;</span>.into())));
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_primary</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::Call</span>(<span class="string">&quot;bla&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="ident">ExprAST::Number</span>(<span class="number">123f64</span>)]))
+            p.parse_primary(),
+            <span class="prelude-val">Ok</span>(ExprAST::Call(<span class="string">&quot;bla&quot;</span>.into(), <span class="macro">vec!</span>[ExprAST::Number(<span class="number">123f64</span>)]))
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_primary</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::If</span> {
-                <span class="ident">cond</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>())),
-                <span class="ident">then</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>())),
-                <span class="ident">else_</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>())),
+            p.parse_primary(),
+            <span class="prelude-val">Ok</span>(ExprAST::If {
+                cond: Box::new(ExprAST::Variable(<span class="string">&quot;a&quot;</span>.into())),
+                then: Box::new(ExprAST::Variable(<span class="string">&quot;b&quot;</span>.into())),
+                else_: Box::new(ExprAST::Variable(<span class="string">&quot;c&quot;</span>.into())),
             })
         );
 
         <span class="macro">assert_eq!</span>(
-            <span class="ident">p</span>.<span class="ident">parse_primary</span>(),
-            <span class="prelude-val">Ok</span>(<span class="ident">ExprAST::For</span> {
-                <span class="ident">var</span>: <span class="ident">String::from</span>(<span class="string">&quot;x&quot;</span>),
-                <span class="ident">start</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">1f64</span>)),
-                <span class="ident">end</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">2f64</span>)),
-                <span class="ident">step</span>: <span class="prelude-val">None</span>,
-                <span class="ident">body</span>: <span class="ident">Box::new</span>(<span class="ident">ExprAST::Number</span>(<span class="number">3f64</span>)),
+            p.parse_primary(),
+            <span class="prelude-val">Ok</span>(ExprAST::For {
+                var: String::from(<span class="string">&quot;x&quot;</span>),
+                start: Box::new(ExprAST::Number(<span class="number">1f64</span>)),
+                end: Box::new(ExprAST::Number(<span class="number">2f64</span>)),
+                step: <span class="prelude-val">None</span>,
+                body: Box::new(ExprAST::Number(<span class="number">3f64</span>)),
             })
         );
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_binary_op</span>() {
-        <span class="comment">// Operator before RHS has higher precedence, expected AST</span>
-        <span class="comment">//</span>
-        <span class="comment">//       -</span>
-        <span class="comment">//      / \</span>
-        <span class="comment">//     +     c</span>
-        <span class="comment">//    / \</span>
-        <span class="comment">//   a   b</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;a + b - c&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_binary_op() {
+        <span class="comment">// Operator before RHS has higher precedence, expected AST
+        //
+        //       -
+        //      / \
+        //     +     c
+        //    / \
+        //   a   b
+        </span><span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;a + b - c&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">binexpr_ab</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(
+        <span class="kw">let </span>binexpr_ab = ExprAST::Binary(
             <span class="string">&#39;+&#39;</span>,
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>())),
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;a&quot;</span>.into())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;b&quot;</span>.into())),
         );
 
-        <span class="kw">let</span> <span class="ident">binexpr_abc</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(
+        <span class="kw">let </span>binexpr_abc = ExprAST::Binary(
             <span class="string">&#39;-&#39;</span>,
-            <span class="ident">Box::new</span>(<span class="ident">binexpr_ab</span>),
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>())),
+            Box::new(binexpr_ab),
+            Box::new(ExprAST::Variable(<span class="string">&quot;c&quot;</span>.into())),
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_expression</span>(), <span class="prelude-val">Ok</span>(<span class="ident">binexpr_abc</span>));
+        <span class="macro">assert_eq!</span>(p.parse_expression(), <span class="prelude-val">Ok</span>(binexpr_abc));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_binary_op2</span>() {
-        <span class="comment">// Operator after RHS has higher precedence, expected AST</span>
-        <span class="comment">//</span>
-        <span class="comment">//       +</span>
-        <span class="comment">//      / \</span>
-        <span class="comment">//     a   *</span>
-        <span class="comment">//        / \</span>
-        <span class="comment">//       b   c</span>
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;a + b * c&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_binary_op2() {
+        <span class="comment">// Operator after RHS has higher precedence, expected AST
+        //
+        //       +
+        //      / \
+        //     a   *
+        //        / \
+        //       b   c
+        </span><span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;a + b * c&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">binexpr_bc</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(
+        <span class="kw">let </span>binexpr_bc = ExprAST::Binary(
             <span class="string">&#39;*&#39;</span>,
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;b&quot;</span>.<span class="ident">into</span>())),
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;c&quot;</span>.<span class="ident">into</span>())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;b&quot;</span>.into())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;c&quot;</span>.into())),
         );
 
-        <span class="kw">let</span> <span class="ident">binexpr_abc</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(
+        <span class="kw">let </span>binexpr_abc = ExprAST::Binary(
             <span class="string">&#39;+&#39;</span>,
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>())),
-            <span class="ident">Box::new</span>(<span class="ident">binexpr_bc</span>),
+            Box::new(ExprAST::Variable(<span class="string">&quot;a&quot;</span>.into())),
+            Box::new(binexpr_bc),
         );
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_expression</span>(), <span class="prelude-val">Ok</span>(<span class="ident">binexpr_abc</span>));
+        <span class="macro">assert_eq!</span>(p.parse_expression(), <span class="prelude-val">Ok</span>(binexpr_abc));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_prototype</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;foo(a,b)&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_prototype() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;foo(a,b)&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="ident">PrototypeAST</span>(<span class="string">&quot;foo&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="string">&quot;a&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;b&quot;</span>.<span class="ident">into</span>()]);
+        <span class="kw">let </span>proto = PrototypeAST(<span class="string">&quot;foo&quot;</span>.into(), <span class="macro">vec!</span>[<span class="string">&quot;a&quot;</span>.into(), <span class="string">&quot;b&quot;</span>.into()]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_prototype</span>(), <span class="prelude-val">Ok</span>(<span class="ident">proto</span>));
+        <span class="macro">assert_eq!</span>(p.parse_prototype(), <span class="prelude-val">Ok</span>(proto));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_definition</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;def bar( arg0 , arg1 ) arg0 + arg1&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_definition() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;def bar( arg0 , arg1 ) arg0 + arg1&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="ident">PrototypeAST</span>(<span class="string">&quot;bar&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[<span class="string">&quot;arg0&quot;</span>.<span class="ident">into</span>(), <span class="string">&quot;arg1&quot;</span>.<span class="ident">into</span>()]);
+        <span class="kw">let </span>proto = PrototypeAST(<span class="string">&quot;bar&quot;</span>.into(), <span class="macro">vec!</span>[<span class="string">&quot;arg0&quot;</span>.into(), <span class="string">&quot;arg1&quot;</span>.into()]);
 
-        <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">ExprAST::Binary</span>(
+        <span class="kw">let </span>body = ExprAST::Binary(
             <span class="string">&#39;+&#39;</span>,
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;arg0&quot;</span>.<span class="ident">into</span>())),
-            <span class="ident">Box::new</span>(<span class="ident">ExprAST::Variable</span>(<span class="string">&quot;arg1&quot;</span>.<span class="ident">into</span>())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;arg0&quot;</span>.into())),
+            Box::new(ExprAST::Variable(<span class="string">&quot;arg1&quot;</span>.into())),
         );
 
-        <span class="kw">let</span> <span class="ident">func</span> <span class="op">=</span> <span class="ident">FunctionAST</span>(<span class="ident">proto</span>, <span class="ident">body</span>);
+        <span class="kw">let </span>func = FunctionAST(proto, body);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_definition</span>(), <span class="prelude-val">Ok</span>(<span class="ident">func</span>));
+        <span class="macro">assert_eq!</span>(p.parse_definition(), <span class="prelude-val">Ok</span>(func));
     }
 
-    <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">parse_extern</span>() {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">p</span> <span class="op">=</span> <span class="ident">parser</span>(<span class="string">&quot;extern baz()&quot;</span>);
+    <span class="attribute">#[test]
+    </span><span class="kw">fn </span>parse_extern() {
+        <span class="kw">let </span><span class="kw-2">mut </span>p = parser(<span class="string">&quot;extern baz()&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">proto</span> <span class="op">=</span> <span class="ident">PrototypeAST</span>(<span class="string">&quot;baz&quot;</span>.<span class="ident">into</span>(), <span class="macro">vec!</span>[]);
+        <span class="kw">let </span>proto = PrototypeAST(<span class="string">&quot;baz&quot;</span>.into(), <span class="macro">vec!</span>[]);
 
-        <span class="macro">assert_eq!</span>(<span class="ident">p</span>.<span class="ident">parse_extern</span>(), <span class="prelude-val">Ok</span>(<span class="ident">proto</span>));
+        <span class="macro">assert_eq!</span>(p.parse_extern(), <span class="prelude-val">Ok</span>(proto));
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

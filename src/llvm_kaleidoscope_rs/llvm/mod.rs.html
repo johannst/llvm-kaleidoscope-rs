@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -78,80 +72,79 @@
 <span id="72">72</span>
 <span id="73">73</span>
 <span id="74">74</span>
-</pre><pre class="rust"><code><span class="doccomment">//! Safe wrapper around the LLVM C API.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! References returned from the LLVM API are tied to the `&#39;llvm` lifetime which is bound to the</span>
-<span class="doccomment">//! context where the objects are created in.</span>
-<span class="doccomment">//! We do not offer wrappers to remove or delete any objects in the context and therefore all the</span>
-<span class="doccomment">//! references will be valid for the liftime of the context.</span>
-<span class="doccomment">//!</span>
-<span class="doccomment">//! For the scope of this tutorial we mainly use assertions to validate the results from the LLVM</span>
-<span class="doccomment">//! API calls.</span>
+</pre><pre class="rust"><code><span class="doccomment">//! Safe wrapper around the LLVM C API.
+//!
+//! References returned from the LLVM API are tied to the `&#39;llvm` lifetime which is bound to the
+//! context where the objects are created in.
+//! We do not offer wrappers to remove or delete any objects in the context and therefore all the
+//! references will be valid for the liftime of the context.
+//!
+//! For the scope of this tutorial we mainly use assertions to validate the results from the LLVM
+//! API calls.
 
-<span class="kw">use</span> <span class="ident">llvm_sys</span>::{
-    <span class="ident">core::LLVMShutdown</span>,
-    <span class="ident">error</span>::{<span class="ident">LLVMDisposeErrorMessage</span>, <span class="ident">LLVMErrorRef</span>, <span class="ident">LLVMGetErrorMessage</span>},
-    <span class="ident">target</span>::{
-        <span class="ident">LLVM_InitializeNativeAsmParser</span>, <span class="ident">LLVM_InitializeNativeAsmPrinter</span>,
-        <span class="ident">LLVM_InitializeNativeTarget</span>,
+</span><span class="kw">use </span>llvm_sys::{
+    core::LLVMShutdown,
+    error::{LLVMDisposeErrorMessage, LLVMErrorRef, LLVMGetErrorMessage},
+    target::{
+        LLVM_InitializeNativeAsmParser, LLVM_InitializeNativeAsmPrinter,
+        LLVM_InitializeNativeTarget,
     },
 };
 
-<span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
+<span class="kw">use </span>std::ffi::CStr;
 
-<span class="kw">mod</span> <span class="ident">basic_block</span>;
-<span class="kw">mod</span> <span class="ident">builder</span>;
-<span class="kw">mod</span> <span class="ident">lljit</span>;
-<span class="kw">mod</span> <span class="ident">module</span>;
-<span class="kw">mod</span> <span class="ident">pass_manager</span>;
-<span class="kw">mod</span> <span class="ident">type_</span>;
-<span class="kw">mod</span> <span class="ident">value</span>;
+<span class="kw">mod </span>basic_block;
+<span class="kw">mod </span>builder;
+<span class="kw">mod </span>lljit;
+<span class="kw">mod </span>module;
+<span class="kw">mod </span>pass_manager;
+<span class="kw">mod </span>type_;
+<span class="kw">mod </span>value;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">basic_block::BasicBlock</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">builder::IRBuilder</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">lljit</span>::{<span class="ident">LLJit</span>, <span class="ident">ResourceTracker</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">module::Module</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">pass_manager::FunctionPassManager</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">type_::Type</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">value</span>::{<span class="ident">FnValue</span>, <span class="ident">PhiValue</span>, <span class="ident">Value</span>};
+<span class="kw">pub use </span>basic_block::BasicBlock;
+<span class="kw">pub use </span>builder::IRBuilder;
+<span class="kw">pub use </span>lljit::{LLJit, ResourceTracker};
+<span class="kw">pub use </span>module::Module;
+<span class="kw">pub use </span>pass_manager::FunctionPassManager;
+<span class="kw">pub use </span>type_::Type;
+<span class="kw">pub use </span>value::{FnValue, PhiValue, Value};
 
-<span class="kw">struct</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="kw-2">mut</span> <span class="ident">libc::c_char</span>);
+<span class="kw">struct </span>Error&lt;<span class="lifetime">&#39;llvm</span>&gt;(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="kw-2">mut </span>libc::c_char);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">err</span>: <span class="ident">LLVMErrorRef</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Error</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        (<span class="op">!</span><span class="ident">err</span>.<span class="ident">is_null</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>(<span class="kw">unsafe</span> { <span class="kw-2">&amp;mut</span> <span class="kw-2">*</span><span class="ident">LLVMGetErrorMessage</span>(<span class="ident">err</span>) }))
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; Error&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="kw">fn </span>from(err: LLVMErrorRef) -&gt; <span class="prelude-ty">Option</span>&lt;Error&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        (!err.is_null()).then(|| Error(<span class="kw">unsafe </span>{ <span class="kw-2">&amp;mut *</span>LLVMGetErrorMessage(err) }))
     }
 
-    <span class="kw">fn</span> <span class="ident">as_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">str</span> {
-        <span class="kw">unsafe</span> { <span class="ident">CStr::from_ptr</span>(<span class="self">self</span>.<span class="number">0</span>) }
-            .<span class="ident">to_str</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Expected valid UTF8 string from LLVM API&quot;</span>)
+    <span class="kw">fn </span>as_str(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>str {
+        <span class="kw">unsafe </span>{ CStr::from_ptr(<span class="self">self</span>.<span class="number">0</span>) }
+            .to_str()
+            .expect(<span class="string">&quot;Expected valid UTF8 string from LLVM API&quot;</span>)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Error</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMDisposeErrorMessage</span>(<span class="self">self</span>.<span class="number">0</span> <span class="kw">as</span> <span class="kw-2">*mut</span> <span class="ident">libc::c_char</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>Error&lt;<span class="lifetime">&#39;_</span>&gt; {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            LLVMDisposeErrorMessage(<span class="self">self</span>.<span class="number">0 </span><span class="kw">as </span><span class="kw-2">*mut </span>libc::c_char);
         }
     }
 }
 
-<span class="doccomment">/// Initialize native target for corresponding to host (useful for jitting).</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">initialize_native_taget</span>() {
-    <span class="kw">unsafe</span> {
-        <span class="macro">assert_eq!</span>(<span class="ident">LLVM_InitializeNativeTarget</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">LLVM_InitializeNativeAsmParser</span>(), <span class="number">0</span>);
-        <span class="macro">assert_eq!</span>(<span class="ident">LLVM_InitializeNativeAsmPrinter</span>(), <span class="number">0</span>);
+<span class="doccomment">/// Initialize native target for corresponding to host (useful for jitting).
+</span><span class="kw">pub fn </span>initialize_native_taget() {
+    <span class="kw">unsafe </span>{
+        <span class="macro">assert_eq!</span>(LLVM_InitializeNativeTarget(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(LLVM_InitializeNativeAsmParser(), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(LLVM_InitializeNativeAsmPrinter(), <span class="number">0</span>);
     }
 }
 
-<span class="doccomment">/// Deallocate and destroy all &quot;ManagedStatic&quot; variables.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>() {
-    <span class="kw">unsafe</span> {
-        <span class="ident">LLVMShutdown</span>();
+<span class="doccomment">/// Deallocate and destroy all &quot;ManagedStatic&quot; variables.
+</span><span class="kw">pub fn </span>shutdown() {
+    <span class="kw">unsafe </span>{
+        LLVMShutdown();
     };
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

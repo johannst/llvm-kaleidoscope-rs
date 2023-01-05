@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>value.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -241,243 +235,242 @@
 <span id="235">235</span>
 <span id="236">236</span>
 <span id="237">237</span>
-</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">unused</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![allow(unused)]
 
-<span class="kw">use</span> <span class="ident">llvm_sys</span>::{
-    <span class="ident">analysis</span>::{<span class="ident">LLVMVerifierFailureAction</span>, <span class="ident">LLVMVerifyFunction</span>},
-    <span class="ident">core</span>::{
-        <span class="ident">LLVMAddIncoming</span>, <span class="ident">LLVMAppendExistingBasicBlock</span>, <span class="ident">LLVMCountBasicBlocks</span>, <span class="ident">LLVMCountParams</span>,
-        <span class="ident">LLVMDumpValue</span>, <span class="ident">LLVMGetParam</span>, <span class="ident">LLVMGetReturnType</span>, <span class="ident">LLVMGetValueKind</span>, <span class="ident">LLVMGetValueName2</span>,
-        <span class="ident">LLVMIsAFunction</span>, <span class="ident">LLVMIsAPHINode</span>, <span class="ident">LLVMSetValueName2</span>, <span class="ident">LLVMTypeOf</span>,
+</span><span class="kw">use </span>llvm_sys::{
+    analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
+    core::{
+        LLVMAddIncoming, LLVMAppendExistingBasicBlock, LLVMCountBasicBlocks, LLVMCountParams,
+        LLVMDumpValue, LLVMGetParam, LLVMGetReturnType, LLVMGetValueKind, LLVMGetValueName2,
+        LLVMIsAFunction, LLVMIsAPHINode, LLVMSetValueName2, LLVMTypeOf,
     },
-    <span class="ident">prelude::LLVMValueRef</span>,
-    <span class="ident">LLVMTypeKind</span>, <span class="ident">LLVMValueKind</span>,
+    prelude::LLVMValueRef,
+    LLVMTypeKind, LLVMValueKind,
 };
 
-<span class="kw">use</span> <span class="ident">std::ffi::CStr</span>;
-<span class="kw">use</span> <span class="ident">std::marker::PhantomData</span>;
-<span class="kw">use</span> <span class="ident">std::ops::Deref</span>;
+<span class="kw">use </span>std::ffi::CStr;
+<span class="kw">use </span>std::marker::PhantomData;
+<span class="kw">use </span>std::ops::Deref;
 
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::BasicBlock</span>;
-<span class="kw">use</span> <span class="ident"><span class="kw">super</span>::Type</span>;
+<span class="kw">use </span><span class="kw">super</span>::BasicBlock;
+<span class="kw">use </span><span class="kw">super</span>::Type;
 
-<span class="doccomment">/// Wrapper for a LLVM Value Reference.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>(<span class="ident">LLVMValueRef</span>, <span class="ident">PhantomData</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> ()<span class="op">&gt;</span>);
+<span class="doccomment">/// Wrapper for a LLVM Value Reference.
+</span><span class="attribute">#[derive(Copy, Clone)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>Value&lt;<span class="lifetime">&#39;llvm</span>&gt;(LLVMValueRef, PhantomData&lt;<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>()&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new Value instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `value_ref` is a null pointer.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value_ref</span>: <span class="ident">LLVMValueRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">value_ref</span>.<span class="ident">is_null</span>());
-        <span class="ident">Value</span>(<span class="ident">value_ref</span>, <span class="ident">PhantomData</span>)
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="doccomment">/// Create a new Value instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `value_ref` is a null pointer.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(value_ref: LLVMValueRef) -&gt; <span class="self">Self </span>{
+        <span class="macro">assert!</span>(!value_ref.is_null());
+        Value(value_ref, PhantomData)
     }
 
-    <span class="doccomment">/// Get the raw LLVM value reference.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">value_ref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LLVMValueRef</span> {
-        <span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Get the raw LLVM value reference.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>value_ref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LLVMValueRef {
+        <span class="self">self</span>.<span class="number">0
+    </span>}
+
+    <span class="doccomment">/// Get the LLVM value kind for the given value reference.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>kind(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LLVMValueKind {
+        <span class="kw">unsafe </span>{ LLVMGetValueKind(<span class="self">self</span>.value_ref()) }
     }
 
-    <span class="doccomment">/// Get the LLVM value kind for the given value reference.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LLVMValueKind</span> {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMGetValueKind</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) }
+    <span class="doccomment">/// Check if value is `function` type.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_function(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>cast = <span class="kw">unsafe </span>{ LLVMIsAFunction(<span class="self">self</span>.value_ref()) };
+        !cast.is_null()
     }
 
-    <span class="doccomment">/// Check if value is `function` type.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_function</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">cast</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMIsAFunction</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) };
-        <span class="op">!</span><span class="ident">cast</span>.<span class="ident">is_null</span>()
+    <span class="doccomment">/// Check if value is `phinode` type.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>is_phinode(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">let </span>cast = <span class="kw">unsafe </span>{ LLVMIsAPHINode(<span class="self">self</span>.value_ref()) };
+        !cast.is_null()
     }
 
-    <span class="doccomment">/// Check if value is `phinode` type.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">is_phinode</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">cast</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMIsAPHINode</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) };
-        <span class="op">!</span><span class="ident">cast</span>.<span class="ident">is_null</span>()
+    <span class="doccomment">/// Dump the LLVM Value to stdout.
+    </span><span class="kw">pub fn </span>dump(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ LLVMDumpValue(<span class="self">self</span>.value_ref()) };
     }
 
-    <span class="doccomment">/// Dump the LLVM Value to stdout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMDumpValue</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) };
+    <span class="doccomment">/// Get a type reference representing for the given value reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>type_of(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>type_ref = <span class="kw">unsafe </span>{ LLVMTypeOf(<span class="self">self</span>.value_ref()) };
+        Type::new(type_ref)
     }
 
-    <span class="doccomment">/// Get a type reference representing for the given value reference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_of</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMTypeOf</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) };
-        <span class="ident">Type::new</span>(<span class="ident">type_ref</span>)
+    <span class="doccomment">/// Set the name for the given value reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>set_name(<span class="kw-2">&amp;</span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) {
+        <span class="kw">unsafe </span>{ LLVMSetValueName2(<span class="self">self</span>.value_ref(), name.as_ptr().cast(), name.len()) };
     }
 
-    <span class="doccomment">/// Set the name for the given value reference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMSetValueName2</span>(<span class="self">self</span>.<span class="ident">value_ref</span>(), <span class="ident">name</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(), <span class="ident">name</span>.<span class="ident">len</span>()) };
-    }
+    <span class="doccomment">/// Get the name for the given value reference.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>get_name(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span>str {
+        <span class="kw">let </span>name = <span class="kw">unsafe </span>{
+            <span class="kw">let </span><span class="kw-2">mut </span>len: libc::size_t = <span class="number">0</span>;
+            <span class="kw">let </span>name = LLVMGetValueName2(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut </span>len <span class="kw">as _</span>);
+            <span class="macro">assert!</span>(!name.is_null());
 
-    <span class="doccomment">/// Get the name for the given value reference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="ident">str</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">len</span>: <span class="ident">libc::size_t</span> <span class="op">=</span> <span class="number">0</span>;
-            <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">LLVMGetValueName2</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="kw-2">&amp;mut</span> <span class="ident">len</span> <span class="kw">as</span> <span class="kw">_</span>);
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">name</span>.<span class="ident">is_null</span>());
-
-            <span class="ident">CStr::from_ptr</span>(<span class="ident">name</span>)
+            CStr::from_ptr(name)
         };
 
-        <span class="comment">// TODO: Does this string live for the time of the LLVM context?!</span>
-        <span class="ident">name</span>.<span class="ident">to_str</span>()
-            .<span class="ident">expect</span>(<span class="string">&quot;Expected valid UTF8 string from LLVM API&quot;</span>)
+        <span class="comment">// TODO: Does this string live for the time of the LLVM context?!
+        </span>name.to_str()
+            .expect(<span class="string">&quot;Expected valid UTF8 string from LLVM API&quot;</span>)
     }
 
-    <span class="doccomment">/// Check if value is of `f64` type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">type_of</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">LLVMTypeKind::LLVMDoubleTypeKind</span>
+    <span class="doccomment">/// Check if value is of `f64` type.
+    </span><span class="kw">pub fn </span>is_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.type_of().kind() == LLVMTypeKind::LLVMDoubleTypeKind
     }
 
-    <span class="doccomment">/// Check if value is of integer type.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_int</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">type_of</span>().<span class="ident">kind</span>() <span class="op">==</span> <span class="ident">LLVMTypeKind::LLVMIntegerTypeKind</span>
-    }
-}
-
-<span class="doccomment">/// Wrapper for a LLVM Value Reference specialized for contexts where function values are needed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>(<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>);
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
+    <span class="doccomment">/// Check if value is of integer type.
+    </span><span class="kw">pub fn </span>is_int(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="self">self</span>.type_of().kind() == LLVMTypeKind::LLVMIntegerTypeKind
     }
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new FnValue instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `value_ref` is a null pointer.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value_ref</span>: <span class="ident">LLVMValueRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::new</span>(<span class="ident">value_ref</span>);
+<span class="doccomment">/// Wrapper for a LLVM Value Reference specialized for contexts where function values are needed.
+</span><span class="attribute">#[derive(Copy, Clone)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;(Value&lt;<span class="lifetime">&#39;llvm</span>&gt;);
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; Deref <span class="kw">for </span>FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="kw">type </span>Target = Value&lt;<span class="lifetime">&#39;llvm</span>&gt;;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
+}
+
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="doccomment">/// Create a new FnValue instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `value_ref` is a null pointer.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(value_ref: LLVMValueRef) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>value = Value::new(value_ref);
         <span class="macro">debug_assert!</span>(
-            <span class="ident">value</span>.<span class="ident">is_function</span>(),
-            <span class="string">&quot;Expected a fn value when constructing FnValue!&quot;</span>
-        );
+            value.is_function(),
+            <span class="string">&quot;Expected a fn value when constructing FnValue!&quot;
+        </span>);
 
-        <span class="ident">FnValue</span>(<span class="ident">value</span>)
+        FnValue(value)
     }
 
-    <span class="doccomment">/// Get a type reference representing the return value of the given function value.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">ret_type</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMGetReturnType</span>(<span class="ident">LLVMTypeOf</span>(<span class="self">self</span>.<span class="ident">value_ref</span>())) };
-        <span class="ident">Type::new</span>(<span class="ident">type_ref</span>)
+    <span class="doccomment">/// Get a type reference representing the return value of the given function value.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>ret_type(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>type_ref = <span class="kw">unsafe </span>{ LLVMGetReturnType(LLVMTypeOf(<span class="self">self</span>.value_ref())) };
+        Type::new(type_ref)
     }
 
-    <span class="doccomment">/// Get the number of function arguments for the given function value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">args</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMCountParams</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
+    <span class="doccomment">/// Get the number of function arguments for the given function value.
+    </span><span class="kw">pub fn </span>args(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ LLVMCountParams(<span class="self">self</span>.value_ref()) <span class="kw">as </span>usize }
     }
 
-    <span class="doccomment">/// Get a value reference for the function argument at index `idx`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer or indexed out of bounds.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">arg</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) -&gt; <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="macro">assert!</span>(<span class="ident">idx</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">args</span>());
+    <span class="doccomment">/// Get a value reference for the function argument at index `idx`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer or indexed out of bounds.
+    </span><span class="kw">pub fn </span>arg(<span class="kw-2">&amp;</span><span class="self">self</span>, idx: usize) -&gt; Value&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="macro">assert!</span>(idx &lt; <span class="self">self</span>.args());
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMGetParam</span>(<span class="self">self</span>.<span class="ident">value_ref</span>(), <span class="ident">idx</span> <span class="kw">as</span> <span class="ident">libc::c_uint</span>) };
-        <span class="ident">Value::new</span>(<span class="ident">value_ref</span>)
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{ LLVMGetParam(<span class="self">self</span>.value_ref(), idx <span class="kw">as </span>libc::c_uint) };
+        Value::new(value_ref)
     }
 
-    <span class="doccomment">/// Get the number of Basic Blocks for the given function value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">basic_blocks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">usize</span> {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMCountBasicBlocks</span>(<span class="self">self</span>.<span class="ident">value_ref</span>()) <span class="kw">as</span> <span class="ident">usize</span> }
+    <span class="doccomment">/// Get the number of Basic Blocks for the given function value.
+    </span><span class="kw">pub fn </span>basic_blocks(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; usize {
+        <span class="kw">unsafe </span>{ LLVMCountBasicBlocks(<span class="self">self</span>.value_ref()) <span class="kw">as </span>usize }
     }
 
-    <span class="doccomment">/// Append a Basic Block to the end of the function value.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_basic_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">bb</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMAppendExistingBasicBlock</span>(<span class="self">self</span>.<span class="ident">value_ref</span>(), <span class="ident">bb</span>.<span class="ident">bb_ref</span>());
+    <span class="doccomment">/// Append a Basic Block to the end of the function value.
+    </span><span class="kw">pub fn </span>append_basic_block(<span class="kw-2">&amp;</span><span class="self">self</span>, bb: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
+        <span class="kw">unsafe </span>{
+            LLVMAppendExistingBasicBlock(<span class="self">self</span>.value_ref(), bb.bb_ref());
         }
     }
 
-    <span class="doccomment">/// Verify that the given function is valid.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">verify</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMVerifyFunction</span>(
-                <span class="self">self</span>.<span class="ident">value_ref</span>(),
-                <span class="ident">LLVMVerifierFailureAction::LLVMPrintMessageAction</span>,
-            ) <span class="op">==</span> <span class="number">0</span>
-        }
+    <span class="doccomment">/// Verify that the given function is valid.
+    </span><span class="kw">pub fn </span>verify(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; bool {
+        <span class="kw">unsafe </span>{
+            LLVMVerifyFunction(
+                <span class="self">self</span>.value_ref(),
+                LLVMVerifierFailureAction::LLVMPrintMessageAction,
+            ) == <span class="number">0
+        </span>}
     }
 }
 
-<span class="doccomment">/// Wrapper for a LLVM Value Reference specialized for contexts where phi values are needed.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>)]</span>
-<span class="attribute">#[<span class="ident">repr</span>(<span class="ident">transparent</span>)]</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PhiValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>(<span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>);
+<span class="doccomment">/// Wrapper for a LLVM Value Reference specialized for contexts where phi values are needed.
+</span><span class="attribute">#[derive(Copy, Clone)]
+#[repr(transparent)]
+</span><span class="kw">pub struct </span>PhiValue&lt;<span class="lifetime">&#39;llvm</span>&gt;(Value&lt;<span class="lifetime">&#39;llvm</span>&gt;);
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">Deref</span> <span class="kw">for</span> <span class="ident">PhiValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="kw">type</span> <span class="ident">Target</span> <span class="op">=</span> <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>;
-    <span class="kw">fn</span> <span class="ident">deref</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident"><span class="self">Self</span>::Target</span> {
-        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>
-    }
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; Deref <span class="kw">for </span>PhiValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="kw">type </span>Target = Value&lt;<span class="lifetime">&#39;llvm</span>&gt;;
+    <span class="kw">fn </span>deref(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="self">Self</span>::Target {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0
+    </span>}
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">PhiValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Create a new PhiValue instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `value_ref` is a null pointer.</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value_ref</span>: <span class="ident">LLVMValueRef</span>) -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">value</span> <span class="op">=</span> <span class="ident">Value::new</span>(<span class="ident">value_ref</span>);
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; PhiValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+    <span class="doccomment">/// Create a new PhiValue instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if `value_ref` is a null pointer.
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>new(value_ref: LLVMValueRef) -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>value = Value::new(value_ref);
         <span class="macro">debug_assert!</span>(
-            <span class="ident">value</span>.<span class="ident">is_phinode</span>(),
-            <span class="string">&quot;Expected a phinode value when constructing PhiValue!&quot;</span>
-        );
+            value.is_phinode(),
+            <span class="string">&quot;Expected a phinode value when constructing PhiValue!&quot;
+        </span>);
 
-        <span class="ident">PhiValue</span>(<span class="ident">value</span>)
+        PhiValue(value)
     }
 
-    <span class="doccomment">/// Add an incoming value to the end of a PHI list.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_incoming</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ival</span>: <span class="ident">Value</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>, <span class="ident">ibb</span>: <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) {
+    <span class="doccomment">/// Add an incoming value to the end of a PHI list.
+    </span><span class="kw">pub fn </span>add_incoming(<span class="kw-2">&amp;</span><span class="self">self</span>, ival: Value&lt;<span class="lifetime">&#39;llvm</span>&gt;, ibb: BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt;) {
         <span class="macro">debug_assert_eq!</span>(
-            <span class="ident">ival</span>.<span class="ident">type_of</span>().<span class="ident">kind</span>(),
-            <span class="self">self</span>.<span class="ident">type_of</span>().<span class="ident">kind</span>(),
-            <span class="string">&quot;Type of incoming phi value must be the same as the type used to build the phi node.&quot;</span>
-        );
+            ival.type_of().kind(),
+            <span class="self">self</span>.type_of().kind(),
+            <span class="string">&quot;Type of incoming phi value must be the same as the type used to build the phi node.&quot;
+        </span>);
 
-        <span class="kw">unsafe</span> {
-            <span class="ident">LLVMAddIncoming</span>(
-                <span class="self">self</span>.<span class="ident">value_ref</span>(),
-                <span class="kw-2">&amp;mut</span> <span class="ident">ival</span>.<span class="ident">value_ref</span>() <span class="kw">as</span> <span class="kw">_</span>,
-                <span class="kw-2">&amp;mut</span> <span class="ident">ibb</span>.<span class="ident">bb_ref</span>() <span class="kw">as</span> <span class="kw">_</span>,
+        <span class="kw">unsafe </span>{
+            LLVMAddIncoming(
+                <span class="self">self</span>.value_ref(),
+                <span class="kw-2">&amp;mut </span>ival.value_ref() <span class="kw">as _</span>,
+                <span class="kw-2">&amp;mut </span>ibb.bb_ref() <span class="kw">as _</span>,
                 <span class="number">1</span>,
             );
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>

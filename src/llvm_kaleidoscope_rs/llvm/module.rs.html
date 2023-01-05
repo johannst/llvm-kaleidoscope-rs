@@ -1,10 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/module.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>module.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a><h2 class="location"></h2>
-    </nav>
-    <nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div>
-        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><button type="button" id="help-button" title="help">?</button><div id="settings-menu" tabindex="-1">
-                                <a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div>
-                        </div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/llvm/module.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>module.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" href="../../../normalize.css"><link rel="stylesheet" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" href="../../../ayu.css" disabled><link rel="stylesheet" href="../../../dark.css" disabled><link rel="stylesheet" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script><script defer src="../../../main.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="mobile-topbar"><button class="sidebar-menu-toggle">&#9776;</button><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a><h2 class="location"></h2></nav><nav class="sidebar"><a class="sidebar-logo" href="../../../llvm_kaleidoscope_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></div></a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../llvm_kaleidoscope_rs/index.html"><img class="rust-logo" src="../../../rust-logo.svg" alt="logo"></a><nav class="sub"><form class="search-form"><div class="search-container"><span></span><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"><div id="help-button" title="help" tabindex="-1"><button type="button">?</button></div><div id="settings-menu" tabindex="-1"><a href="../../../settings.html" title="settings"><img width="22" height="22" alt="Change settings" src="../../../wheel.svg"></a></div></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">1</span>
 <span id="2">2</span>
 <span id="3">3</span>
 <span id="4">4</span>
@@ -214,216 +208,215 @@
 <span id="208">208</span>
 <span id="209">209</span>
 <span id="210">210</span>
-</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">llvm_sys</span>::{
-    <span class="ident">core</span>::{
-        <span class="ident">LLVMAddFunction</span>, <span class="ident">LLVMAppendBasicBlockInContext</span>, <span class="ident">LLVMCreateBasicBlockInContext</span>,
-        <span class="ident">LLVMDisposeModule</span>, <span class="ident">LLVMDoubleTypeInContext</span>, <span class="ident">LLVMDumpModule</span>, <span class="ident">LLVMGetNamedFunction</span>,
-        <span class="ident">LLVMModuleCreateWithNameInContext</span>,
+</pre><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+    core::{
+        LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMCreateBasicBlockInContext,
+        LLVMDisposeModule, LLVMDoubleTypeInContext, LLVMDumpModule, LLVMGetNamedFunction,
+        LLVMModuleCreateWithNameInContext,
     },
-    <span class="ident">orc2</span>::{
-        <span class="ident">LLVMOrcCreateNewThreadSafeContext</span>, <span class="ident">LLVMOrcCreateNewThreadSafeModule</span>,
-        <span class="ident">LLVMOrcDisposeThreadSafeContext</span>, <span class="ident">LLVMOrcThreadSafeContextGetContext</span>,
-        <span class="ident">LLVMOrcThreadSafeContextRef</span>, <span class="ident">LLVMOrcThreadSafeModuleRef</span>,
+    orc2::{
+        LLVMOrcCreateNewThreadSafeContext, LLVMOrcCreateNewThreadSafeModule,
+        LLVMOrcDisposeThreadSafeContext, LLVMOrcThreadSafeContextGetContext,
+        LLVMOrcThreadSafeContextRef, LLVMOrcThreadSafeModuleRef,
     },
-    <span class="ident">prelude</span>::{<span class="ident">LLVMBool</span>, <span class="ident">LLVMContextRef</span>, <span class="ident">LLVMModuleRef</span>, <span class="ident">LLVMTypeRef</span>},
-    <span class="ident">LLVMTypeKind</span>,
+    prelude::{LLVMBool, LLVMContextRef, LLVMModuleRef, LLVMTypeRef},
+    LLVMTypeKind,
 };
 
-<span class="kw">use</span> <span class="ident">std::convert::TryFrom</span>;
+<span class="kw">use </span>std::convert::TryFrom;
 
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">BasicBlock</span>, <span class="ident">FnValue</span>, <span class="ident">Type</span>};
-<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::SmallCStr</span>;
+<span class="kw">use super</span>::{BasicBlock, FnValue, Type};
+<span class="kw">use </span><span class="kw">crate</span>::SmallCStr;
 
-<span class="comment">// Definition of LLVM C API functions using our `repr(transparent)` types.</span>
-<span class="kw">extern</span> <span class="string">&quot;C&quot;</span> {
-    <span class="kw">fn</span> <span class="ident">LLVMFunctionType</span>(
-        <span class="ident">ReturnType</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">ParamTypes</span>: <span class="kw-2">*mut</span> <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-        <span class="ident">ParamCount</span>: <span class="ident">::libc::c_uint</span>,
-        <span class="ident">IsVarArg</span>: <span class="ident">LLVMBool</span>,
-    ) -&gt; <span class="ident">LLVMTypeRef</span>;
+<span class="comment">// Definition of LLVM C API functions using our `repr(transparent)` types.
+</span><span class="kw">extern </span><span class="string">&quot;C&quot; </span>{
+    <span class="kw">fn </span>LLVMFunctionType(
+        ReturnType: Type&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ParamTypes: <span class="kw-2">*mut </span>Type&lt;<span class="lifetime">&#39;_</span>&gt;,
+        ParamCount: ::libc::c_uint,
+        IsVarArg: LLVMBool,
+    ) -&gt; LLVMTypeRef;
 }
 
-<span class="doccomment">/// Wrapper for a LLVM Module with its own LLVM Context.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Module</span> {
-    <span class="ident">tsctx</span>: <span class="ident">LLVMOrcThreadSafeContextRef</span>,
-    <span class="ident">ctx</span>: <span class="ident">LLVMContextRef</span>,
-    <span class="ident">module</span>: <span class="ident">LLVMModuleRef</span>,
+<span class="doccomment">/// Wrapper for a LLVM Module with its own LLVM Context.
+</span><span class="kw">pub struct </span>Module {
+    tsctx: LLVMOrcThreadSafeContextRef,
+    ctx: LLVMContextRef,
+    module: LLVMModuleRef,
 }
 
-<span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> <span class="ident">Module</span> {
-    <span class="doccomment">/// Create a new Module instance.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if creating the context or the module fails.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
-        <span class="kw">let</span> (<span class="ident">tsctx</span>, <span class="ident">ctx</span>, <span class="ident">module</span>) <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="comment">// We generate a thread safe context because we are going to jit this IR module and</span>
-            <span class="comment">// there is no method to create a thread safe context wrapper from an existing context</span>
-            <span class="comment">// reference (at the time of writing this).</span>
-            <span class="comment">//</span>
-            <span class="comment">// ThreadSafeContext has shared ownership (start with ref count 1).</span>
-            <span class="comment">// We must explicitly dispose our reference (dec ref count).</span>
-            <span class="kw">let</span> <span class="ident">tc</span> <span class="op">=</span> <span class="ident">LLVMOrcCreateNewThreadSafeContext</span>();
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">tc</span>.<span class="ident">is_null</span>());
+<span class="kw">impl</span>&lt;<span class="lifetime">&#39;llvm</span>&gt; Module {
+    <span class="doccomment">/// Create a new Module instance.
+    ///
+    /// # Panics
+    ///
+    /// Panics if creating the context or the module fails.
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        <span class="kw">let </span>(tsctx, ctx, module) = <span class="kw">unsafe </span>{
+            <span class="comment">// We generate a thread safe context because we are going to jit this IR module and
+            // there is no method to create a thread safe context wrapper from an existing context
+            // reference (at the time of writing this).
+            //
+            // ThreadSafeContext has shared ownership (start with ref count 1).
+            // We must explicitly dispose our reference (dec ref count).
+            </span><span class="kw">let </span>tc = LLVMOrcCreateNewThreadSafeContext();
+            <span class="macro">assert!</span>(!tc.is_null());
 
-            <span class="kw">let</span> <span class="ident">c</span> <span class="op">=</span> <span class="ident">LLVMOrcThreadSafeContextGetContext</span>(<span class="ident">tc</span>);
-            <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">LLVMModuleCreateWithNameInContext</span>(<span class="string">b&quot;module\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(), <span class="ident">c</span>);
-            <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">c</span>.<span class="ident">is_null</span>() <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">m</span>.<span class="ident">is_null</span>());
-            (<span class="ident">tc</span>, <span class="ident">c</span>, <span class="ident">m</span>)
+            <span class="kw">let </span>c = LLVMOrcThreadSafeContextGetContext(tc);
+            <span class="kw">let </span>m = LLVMModuleCreateWithNameInContext(<span class="string">b&quot;module\0&quot;</span>.as_ptr().cast(), c);
+            <span class="macro">assert!</span>(!c.is_null() &amp;&amp; !m.is_null());
+            (tc, c, m)
         };
 
-        <span class="ident">Module</span> { <span class="ident">tsctx</span>, <span class="ident">ctx</span>, <span class="ident">module</span> }
+        Module { tsctx, ctx, module }
     }
 
-    <span class="doccomment">/// Get the raw LLVM context reference.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">ctx</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LLVMContextRef</span> {
-        <span class="self">self</span>.<span class="ident">ctx</span>
+    <span class="doccomment">/// Get the raw LLVM context reference.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>ctx(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LLVMContextRef {
+        <span class="self">self</span>.ctx
     }
 
-    <span class="doccomment">/// Get the raw LLVM module reference.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">module</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">LLVMModuleRef</span> {
-        <span class="self">self</span>.<span class="ident">module</span>
+    <span class="doccomment">/// Get the raw LLVM module reference.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>module(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; LLVMModuleRef {
+        <span class="self">self</span>.module
     }
 
-    <span class="doccomment">/// Consume the module and turn in into a raw LLVM ThreadSafeModule reference.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// If ownership of the raw reference is not transferred (eg to the JIT), memory will be leaked</span>
-    <span class="doccomment">/// in case the reference is disposed explicitly with LLVMOrcDisposeThreadSafeModule.</span>
-    <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">into_raw_thread_safe_module</span>(<span class="kw-2">mut</span> <span class="self">self</span>) -&gt; <span class="ident">LLVMOrcThreadSafeModuleRef</span> {
-        <span class="kw">let</span> <span class="ident">m</span> <span class="op">=</span> <span class="ident">std::mem::replace</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">module</span>, <span class="ident">std::ptr::null_mut</span>());
+    <span class="doccomment">/// Consume the module and turn in into a raw LLVM ThreadSafeModule reference.
+    ///
+    /// If ownership of the raw reference is not transferred (eg to the JIT), memory will be leaked
+    /// in case the reference is disposed explicitly with LLVMOrcDisposeThreadSafeModule.
+    </span><span class="attribute">#[inline]
+    </span><span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn </span>into_raw_thread_safe_module(<span class="kw-2">mut </span><span class="self">self</span>) -&gt; LLVMOrcThreadSafeModuleRef {
+        <span class="kw">let </span>m = std::mem::replace(<span class="kw-2">&amp;mut </span><span class="self">self</span>.module, std::ptr::null_mut());
 
-        <span class="comment">// ThreadSafeModule has unique ownership.</span>
-        <span class="comment">// Takes ownership of module and increments ThreadSafeContext ref count.</span>
-        <span class="comment">//</span>
-        <span class="comment">// We must not reference/dispose `m` after this call, but we need to dispose our `tsctx`</span>
-        <span class="comment">// reference.</span>
-        <span class="kw">let</span> <span class="ident">tm</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMOrcCreateNewThreadSafeModule</span>(<span class="ident">m</span>, <span class="self">self</span>.<span class="ident">tsctx</span>) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">tm</span>.<span class="ident">is_null</span>());
+        <span class="comment">// ThreadSafeModule has unique ownership.
+        // Takes ownership of module and increments ThreadSafeContext ref count.
+        //
+        // We must not reference/dispose `m` after this call, but we need to dispose our `tsctx`
+        // reference.
+        </span><span class="kw">let </span>tm = <span class="kw">unsafe </span>{ LLVMOrcCreateNewThreadSafeModule(m, <span class="self">self</span>.tsctx) };
+        <span class="macro">assert!</span>(!tm.is_null());
 
-        <span class="ident">tm</span>
+        tm
     }
 
-    <span class="doccomment">/// Dump LLVM IR emitted into the Module to stdout.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">dump</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="kw">unsafe</span> { <span class="ident">LLVMDumpModule</span>(<span class="self">self</span>.<span class="ident">module</span>) };
+    <span class="doccomment">/// Dump LLVM IR emitted into the Module to stdout.
+    </span><span class="kw">pub fn </span>dump(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{ LLVMDumpModule(<span class="self">self</span>.module) };
     }
 
-    <span class="doccomment">/// Get a type reference representing a `f64` float.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_f64</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMDoubleTypeInContext</span>(<span class="self">self</span>.<span class="ident">ctx</span>) };
-        <span class="ident">Type::new</span>(<span class="ident">type_ref</span>)
+    <span class="doccomment">/// Get a type reference representing a `f64` float.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>type_f64(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; Type&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>type_ref = <span class="kw">unsafe </span>{ LLVMDoubleTypeInContext(<span class="self">self</span>.ctx) };
+        Type::new(type_ref)
     }
 
-    <span class="doccomment">/// Get a type reference representing a `fn(args) -&gt; ret` function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="self">self</span>, <span class="ident">args</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>], <span class="ident">ret</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">type_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMFunctionType</span>(
-                <span class="ident">ret</span>,
-                <span class="ident">args</span>.<span class="ident">as_mut_ptr</span>(),
-                <span class="ident">args</span>.<span class="ident">len</span>() <span class="kw">as</span> <span class="ident">libc::c_uint</span>,
-                <span class="number">0</span>, <span class="comment">/* IsVarArg */</span>
-            )
+    <span class="doccomment">/// Get a type reference representing a `fn(args) -&gt; ret` function.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>type_fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="self">self</span>, args: <span class="kw-2">&amp;mut </span>[Type&lt;<span class="lifetime">&#39;llvm</span>&gt;], ret: Type&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; Type&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>type_ref = <span class="kw">unsafe </span>{
+            LLVMFunctionType(
+                ret,
+                args.as_mut_ptr(),
+                args.len() <span class="kw">as </span>libc::c_uint,
+                <span class="number">0</span>, <span class="comment">/* IsVarArg */
+            </span>)
         };
-        <span class="ident">Type::new</span>(<span class="ident">type_ref</span>)
+        Type::new(type_ref)
     }
 
-    <span class="doccomment">/// Add a function with the given `name` and `fn_type` to the module and return a value</span>
-    <span class="doccomment">/// reference representing the function.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer or `name` could not be converted to a</span>
-    <span class="doccomment">/// [`SmallCStr`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">fn_type</span>: <span class="ident">Type</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Add a function with the given `name` and `fn_type` to the module and return a value
+    /// reference representing the function.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer or `name` could not be converted to a
+    /// [`SmallCStr`].
+    </span><span class="kw">pub fn </span>add_fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str, fn_type: Type&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt; {
         <span class="macro">debug_assert_eq!</span>(
-            <span class="ident">fn_type</span>.<span class="ident">kind</span>(),
-            <span class="ident">LLVMTypeKind::LLVMFunctionTypeKind</span>,
-            <span class="string">&quot;Expected a function type when adding a function!&quot;</span>
-        );
+            fn_type.kind(),
+            LLVMTypeKind::LLVMFunctionTypeKind,
+            <span class="string">&quot;Expected a function type when adding a function!&quot;
+        </span>);
 
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">SmallCStr::try_from</span>(<span class="ident">name</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Failed to convert &#39;name&#39; argument to small C string!&quot;</span>);
+        <span class="kw">let </span>name = SmallCStr::try_from(name)
+            .expect(<span class="string">&quot;Failed to convert &#39;name&#39; argument to small C string!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMAddFunction</span>(<span class="self">self</span>.<span class="ident">module</span>, <span class="ident">name</span>.<span class="ident">as_ptr</span>(), <span class="ident">fn_type</span>.<span class="ident">type_ref</span>()) };
-        <span class="ident">FnValue::new</span>(<span class="ident">value_ref</span>)
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{ LLVMAddFunction(<span class="self">self</span>.module, name.as_ptr(), fn_type.type_ref()) };
+        FnValue::new(value_ref)
     }
 
-    <span class="doccomment">/// Get a function value reference to the function with the given `name` if it was previously</span>
-    <span class="doccomment">/// added to the module with [`add_fn`][Module::add_fn].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if `name` could not be converted to a [`SmallCStr`].</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">get_fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) -&gt; <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">SmallCStr::try_from</span>(<span class="ident">name</span>)
-            .<span class="ident">expect</span>(<span class="string">&quot;Failed to convert &#39;name&#39; argument to small C string!&quot;</span>);
+    <span class="doccomment">/// Get a function value reference to the function with the given `name` if it was previously
+    /// added to the module with [`add_fn`][Module::add_fn].
+    ///
+    /// # Panics
+    ///
+    /// Panics if `name` could not be converted to a [`SmallCStr`].
+    </span><span class="kw">pub fn </span>get_fn(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="self">self</span>, name: <span class="kw-2">&amp;</span>str) -&gt; <span class="prelude-ty">Option</span>&lt;FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;&gt; {
+        <span class="kw">let </span>name = SmallCStr::try_from(name)
+            .expect(<span class="string">&quot;Failed to convert &#39;name&#39; argument to small C string!&quot;</span>);
 
-        <span class="kw">let</span> <span class="ident">value_ref</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMGetNamedFunction</span>(<span class="self">self</span>.<span class="ident">module</span>, <span class="ident">name</span>.<span class="ident">as_ptr</span>()) };
+        <span class="kw">let </span>value_ref = <span class="kw">unsafe </span>{ LLVMGetNamedFunction(<span class="self">self</span>.module, name.as_ptr()) };
 
-        (<span class="op">!</span><span class="ident">value_ref</span>.<span class="ident">is_null</span>()).<span class="ident">then</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">FnValue::new</span>(<span class="ident">value_ref</span>))
+        (!value_ref.is_null()).then(|| FnValue::new(value_ref))
     }
 
-    <span class="doccomment">/// Append a Basic Block to the end of the function referenced by the value reference</span>
-    <span class="doccomment">/// `fn_value`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">append_basic_block</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm</span> <span class="self">self</span>, <span class="ident">fn_value</span>: <span class="ident">FnValue</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span>) -&gt; <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw">unsafe</span> {
-            <span class="ident">LLVMAppendBasicBlockInContext</span>(
-                <span class="self">self</span>.<span class="ident">ctx</span>,
-                <span class="ident">fn_value</span>.<span class="ident">value_ref</span>(),
-                <span class="string">b&quot;block\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>(),
+    <span class="doccomment">/// Append a Basic Block to the end of the function referenced by the value reference
+    /// `fn_value`.
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>append_basic_block(<span class="kw-2">&amp;</span><span class="lifetime">&#39;llvm </span><span class="self">self</span>, fn_value: FnValue&lt;<span class="lifetime">&#39;llvm</span>&gt;) -&gt; BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>block = <span class="kw">unsafe </span>{
+            LLVMAppendBasicBlockInContext(
+                <span class="self">self</span>.ctx,
+                fn_value.value_ref(),
+                <span class="string">b&quot;block\0&quot;</span>.as_ptr().cast(),
             )
         };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">block</span>.<span class="ident">is_null</span>());
+        <span class="macro">assert!</span>(!block.is_null());
 
-        <span class="ident">BasicBlock::new</span>(<span class="ident">block</span>)
+        BasicBlock::new(block)
     }
 
-    <span class="doccomment">/// Create a free-standing Basic Block without adding it to a function.</span>
-    <span class="doccomment">/// This can be added to a function at a later point in time with</span>
-    <span class="doccomment">/// [`FnValue::append_basic_block`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Panics</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Panics if LLVM API returns a `null` pointer.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_basic_block</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">BasicBlock</span><span class="op">&lt;</span><span class="lifetime">&#39;llvm</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">block</span> <span class="op">=</span> <span class="kw">unsafe</span> { <span class="ident">LLVMCreateBasicBlockInContext</span>(<span class="self">self</span>.<span class="ident">ctx</span>, <span class="string">b&quot;block\0&quot;</span>.<span class="ident">as_ptr</span>().<span class="ident">cast</span>()) };
-        <span class="macro">assert!</span>(<span class="op">!</span><span class="ident">block</span>.<span class="ident">is_null</span>());
+    <span class="doccomment">/// Create a free-standing Basic Block without adding it to a function.
+    /// This can be added to a function at a later point in time with
+    /// [`FnValue::append_basic_block`].
+    ///
+    /// # Panics
+    ///
+    /// Panics if LLVM API returns a `null` pointer.
+    </span><span class="kw">pub fn </span>create_basic_block(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; BasicBlock&lt;<span class="lifetime">&#39;llvm</span>&gt; {
+        <span class="kw">let </span>block = <span class="kw">unsafe </span>{ LLVMCreateBasicBlockInContext(<span class="self">self</span>.ctx, <span class="string">b&quot;block\0&quot;</span>.as_ptr().cast()) };
+        <span class="macro">assert!</span>(!block.is_null());
 
-        <span class="ident">BasicBlock::new</span>(<span class="ident">block</span>)
+        BasicBlock::new(block)
     }
 }
 
-<span class="kw">impl</span> <span class="ident">Drop</span> <span class="kw">for</span> <span class="ident">Module</span> {
-    <span class="kw">fn</span> <span class="ident">drop</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
-        <span class="kw">unsafe</span> {
-            <span class="comment">// In case we turned the module into a ThreadSafeModule, we must not dispose the module</span>
-            <span class="comment">// reference because ThreadSafeModule took ownership!</span>
-            <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">module</span>.<span class="ident">is_null</span>() {
-                <span class="ident">LLVMDisposeModule</span>(<span class="self">self</span>.<span class="ident">module</span>);
+<span class="kw">impl </span>Drop <span class="kw">for </span>Module {
+    <span class="kw">fn </span>drop(<span class="kw-2">&amp;mut </span><span class="self">self</span>) {
+        <span class="kw">unsafe </span>{
+            <span class="comment">// In case we turned the module into a ThreadSafeModule, we must not dispose the module
+            // reference because ThreadSafeModule took ownership!
+            </span><span class="kw">if </span>!<span class="self">self</span>.module.is_null() {
+                LLVMDisposeModule(<span class="self">self</span>.module);
             }
 
-            <span class="comment">// Dispose ThreadSafeContext reference (dec ref count) in any case.</span>
-            <span class="ident">LLVMOrcDisposeThreadSafeContext</span>(<span class="self">self</span>.<span class="ident">tsctx</span>);
+            <span class="comment">// Dispose ThreadSafeContext reference (dec ref count) in any case.
+            </span>LLVMOrcDisposeThreadSafeContext(<span class="self">self</span>.tsctx);
         }
     }
 }
 </code></pre></div>
-</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.63.0 (4b91a6ea7 2022-08-08)" ></div>
-</body></html>
+</section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="llvm_kaleidoscope_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.65.0 (897e37553 2022-11-02)" ></div></body></html>
