@@ -1,5 +1,12 @@
 # llvm-kaleidoscope-rs
 
+[![Rust][wf-badge]][wf-output] [![Rustdoc][doc-badge]][doc-html]
+
+[wf-output]: https://github.com/johannst/llvm-kaleidoscope-rs/actions/workflows/check.yml
+[wf-badge]: https://github.com/johannst/llvm-kaleidoscope-rs/actions/workflows/check.yml/badge.svg
+[doc-html]: https://johannst.github.io/llvm-kaleidoscope-rs/llvm_kaleidoscope_rs/index.html
+[doc-badge]: https://img.shields.io/badge/llvm__kaleidoscope__rs-rustdoc-blue.svg?style=flat&logo=rust
+
 The purpose of this repository is to learn about the [`llvm`][llvm] compiler
 infrastructure and practice some [`rust-lang`][rust].
 
