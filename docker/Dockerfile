@@ -8,10 +8,11 @@ RUN apt update && \
       ca-certificates \
       build-essential \
       cargo \
-      llvm-14 \
-      llvm-14-dev \
+      llvm-15 \
+      llvm-15-dev \
+      # For polly dependency.
       # https://gitlab.com/taricorp/llvm-sys.rs/-/issues/13
-      libclang-common-14-dev \
+      libclang-common-15-dev \
       zlib1g-dev \
       && \
     rm -rf /var/lib/apt/lists/* && \

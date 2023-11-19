@@ -4,13 +4,12 @@ use llvm_sys::{
     analysis::{LLVMVerifierFailureAction, LLVMVerifyFunction},
     core::{
         LLVMAddIncoming, LLVMAppendExistingBasicBlock, LLVMCountBasicBlocks, LLVMCountParams,
-        LLVMDumpValue, LLVMGetParam, LLVMGetReturnType, LLVMGetValueKind, LLVMGetValueName2,
+        LLVMDumpValue, LLVMGetParam, LLVMGetValueKind, LLVMGetValueName2, LLVMGlobalGetValueType,
         LLVMIsAFunction, LLVMIsAPHINode, LLVMSetValueName2, LLVMTypeOf,
     },
     prelude::LLVMValueRef,
     LLVMTypeKind, LLVMValueKind,
 };
-
 use std::ffi::CStr;
 use std::marker::PhantomData;
 use std::ops::Deref;
@@ -139,13 +138,15 @@ impl<'llvm> FnValue<'llvm> {
         FnValue(value)
     }
 
-    /// Get a type reference representing the return value of the given function value.
+    /// Get a type reference representing the function type (return + args) of the given function
+    /// value.
     ///
     /// # Panics
     ///
     /// Panics if LLVM API returns a `null` pointer.
-    pub fn ret_type(&self) -> Type<'llvm> {
-        let type_ref = unsafe { LLVMGetReturnType(LLVMTypeOf(self.value_ref())) };
+    pub fn fn_type(&self) -> Type<'llvm> {
+        // https://github.com/llvm/llvm-project/issues/72798
+        let type_ref = unsafe { LLVMGlobalGetValueType(self.value_ref()) };
         Type::new(type_ref)
     }
 

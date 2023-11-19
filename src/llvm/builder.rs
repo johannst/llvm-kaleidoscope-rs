@@ -195,7 +195,7 @@ impl<'llvm> IRBuilder<'llvm> {
         let value_ref = unsafe {
             LLVMBuildCall2(
                 self.builder,
-                fn_value.ret_type(),
+                fn_value.fn_type(),
                 fn_value,
                 args.as_mut_ptr(),
                 args.len() as libc::c_uint,
