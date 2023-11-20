@@ -61,15 +61,25 @@ Rustdoc for this crate is available at
 
 ## Build with provided container file
 
-The provided [Dockerfile](docker/Dockerfile) documents the required
+The provided [Dockerfile](container/Dockerfile) documents the required
 dependencies for an ubuntu based system and serves as a build environment with
 the correct llvm version as specified in the [Cargo.toml](Cargo.toml) file.
 
 ```bash
+## Either user podman ..
+
 # Build the image *ks-rs*. Depending on the downlink this may take some minutes.
-make -C docker
+make -C container
 
 podman run --rm -it -v $PWD:/work -w /work ks-rs
+# Drops into a shell in the container, just use cargo build / run ...
+
+## .. or docker.
+
+# Build the image *ks-rs*. Depending on the downlink this may take some minutes.
+make -C container docker
+
+docker run --rm -it -v $PWD:/work -w /work ks-rs
 # Drops into a shell in the container, just use cargo build / run ...
 ```
 
