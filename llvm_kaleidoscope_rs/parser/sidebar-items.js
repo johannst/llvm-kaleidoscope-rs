@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"enum":[["ExprAST",""]],"struct":[["FunctionAST","FunctionAST - This class represents a function definition itself."],["Parser","Parser for the `kaleidoscope` language."],["PrototypeAST","PrototypeAST - This class represents the “prototype” for a function, which captures its name, and its argument names (thus implicitly the number of arguments the function takes)."]]};
+window.SIDEBAR_ITEMS = {"enum":["ExprAST"],"struct":["FunctionAST","Parser","PrototypeAST"]};
