@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test and generate Doc
 
 on:
   push:
@@ -15,7 +15,17 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: make -C container
+
     - run: cargo fmt -- --check
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo build --verbose
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo test --verbose
 
+    - name: Generate doc
+      run: |
+          cargo doc --no-deps
+          echo "<meta http-equiv=\"Refresh\" content=\"0; url='llvm_kaleidoscope_rs/index.html'\"/>" > target/doc/index.html
+    - name: Upload doc to gh pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./target/doc
