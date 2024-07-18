@@ -10,26 +10,16 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  infra:
+  ci:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: make -C container
 
-  build:
-    runs-on: ubuntu-latest
-    needs: infra
-    steps:
-    - uses: actions/checkout@v2
     - run: cargo fmt -- --check
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo build --verbose
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo test --verbose
 
-  doc:
-    runs-on: ubuntu-latest
-    needs: infra
-    steps:
-    - uses: actions/checkout@v2
     - name: Generate doc
       run: |
           podman run --rm -it -v $PWD:/work -w /work ks-rs cargo doc --no-deps
