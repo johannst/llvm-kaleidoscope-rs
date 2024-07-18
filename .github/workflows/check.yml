@@ -8,6 +8,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
+  PODMAN_RUN: podman run --rm -it -v $PWD:/work -w /work ks-rs
 
 jobs:
   ci:
@@ -17,12 +18,12 @@ jobs:
     - run: make -C container
 
     - run: cargo fmt -- --check
-    - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo build --verbose
-    - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo test --verbose
+    - run: $PODMAN_RUN cargo build --verbose
+    - run: $PODMAN_RUN cargo test --verbose
 
     - name: Generate doc
       run: |
-          podman run --rm -it -v $PWD:/work -w /work ks-rs cargo doc --no-deps
+          $PODMAN_RUN cargo doc --no-deps
           echo "<meta http-equiv=\"Refresh\" content=\"0; url='llvm_kaleidoscope_rs/index.html'\"/>" > target/doc/index.html
     - name: Upload doc to gh pages
       uses: peaceiris/actions-gh-pages@v3
