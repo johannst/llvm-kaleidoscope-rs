@@ -14,9 +14,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+    - run: which docker
+    - run: which podman
     - run: cargo fmt -- --check
     - run: cargo build --verbose
     - run: cargo test --verbose
-    - run: which docker
-    - run: which podman
 
