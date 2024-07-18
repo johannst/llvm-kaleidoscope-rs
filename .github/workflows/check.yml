@@ -10,19 +10,27 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  init:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - run: make -C container
 
+  build:
+    runs-on: ubuntu-latest
+    needs: init
+    steps:
     - run: cargo fmt -- --check
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo build --verbose
     - run: podman run --rm -it -v $PWD:/work -w /work ks-rs cargo test --verbose
 
+  doc:
+    runs-on: ubuntu-latest
+    needs: init
+    steps:
     - name: Generate doc
       run: |
-          cargo doc --no-deps
+          podman run --rm -it -v $PWD:/work -w /work ks-rs cargo doc --no-deps
           echo "<meta http-equiv=\"Refresh\" content=\"0; url='llvm_kaleidoscope_rs/index.html'\"/>" > target/doc/index.html
     - name: Upload doc to gh pages
       uses: peaceiris/actions-gh-pages@v3
