@@ -17,4 +17,6 @@ jobs:
     - run: cargo fmt -- --check
     - run: cargo build --verbose
     - run: cargo test --verbose
+    - run: which docker
+    - run: which podman
 
