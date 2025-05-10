@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp <dev@memzero.de>
+
 #[derive(Debug, PartialEq)]
 pub enum Token {
     Eof,

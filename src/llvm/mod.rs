@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp <dev@memzero.de>
+
 //! Safe wrapper around the LLVM C API.
 //!
 //! References returned from the LLVM API are tied to the `'llvm` lifetime which is bound to the

@@ -1,3 +1,7 @@
+// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp <dev@memzero.de>
+
 use llvm_kaleidoscope_rs::{
     codegen::Codegen,
     lexer::{Lexer, Token},
