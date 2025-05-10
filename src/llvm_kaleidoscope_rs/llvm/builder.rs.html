@@ -277,7 +277,15 @@
 <a href="#277" id="277">277</a>
 <a href="#278" id="278">278</a>
 <a href="#279" id="279">279</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+<a href="#280" id="280">280</a>
+<a href="#281" id="281">281</a>
+<a href="#282" id="282">282</a>
+<a href="#283" id="283">283</a>
+</pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp &lt;dev@memzero.de&gt;
+
+</span><span class="kw">use </span>llvm_sys::{
     core::{
         LLVMAddIncoming, LLVMBuildBr, LLVMBuildCondBr, LLVMBuildFAdd, LLVMBuildFCmp, LLVMBuildFMul,
         LLVMBuildFSub, LLVMBuildPhi, LLVMBuildRet, LLVMBuildUIToFP, LLVMCreateBuilderInContext,

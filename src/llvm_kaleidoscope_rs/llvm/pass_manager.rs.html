@@ -73,7 +73,15 @@
 <a href="#73" id="73">73</a>
 <a href="#74" id="74">74</a>
 <a href="#75" id="75">75</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+<a href="#76" id="76">76</a>
+<a href="#77" id="77">77</a>
+<a href="#78" id="78">78</a>
+<a href="#79" id="79">79</a>
+</pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp &lt;dev@memzero.de&gt;
+
+</span><span class="kw">use </span>llvm_sys::{
     core::{
         LLVMCreateFunctionPassManagerForModule, LLVMDisposePassManager,
         LLVMInitializeFunctionPassManager, LLVMRunFunctionPassManager,

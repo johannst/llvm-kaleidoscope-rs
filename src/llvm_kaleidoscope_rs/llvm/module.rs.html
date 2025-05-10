@@ -208,7 +208,15 @@
 <a href="#208" id="208">208</a>
 <a href="#209" id="209">209</a>
 <a href="#210" id="210">210</a>
-</pre></div><pre class="rust"><code><span class="kw">use </span>llvm_sys::{
+<a href="#211" id="211">211</a>
+<a href="#212" id="212">212</a>
+<a href="#213" id="213">213</a>
+<a href="#214" id="214">214</a>
+</pre></div><pre class="rust"><code><span class="comment">// SPDX-License-Identifier: MIT
+//
+// Copyright (c) 2021, Johannes Stoelp &lt;dev@memzero.de&gt;
+
+</span><span class="kw">use </span>llvm_sys::{
     core::{
         LLVMAddFunction, LLVMAppendBasicBlockInContext, LLVMCreateBasicBlockInContext,
         LLVMDisposeModule, LLVMDoubleTypeInContext, LLVMDumpModule, LLVMGetNamedFunction,
